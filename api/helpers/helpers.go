@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ansible-semaphore/semaphore/services/tasks"
 	"net/http"
 	"net/url"
 	"runtime/debug"
 	"strconv"
 	"strings"
+
+	"github.com/ansible-semaphore/semaphore/services/tasks"
 
 	"github.com/gorilla/context"
 	log "github.com/sirupsen/logrus"
@@ -27,7 +28,7 @@ func TaskPool(r *http.Request) *tasks.TaskPool {
 	return context.Get(r, "task_pool").(*tasks.TaskPool)
 }
 
-func isXHR(w http.ResponseWriter, r *http.Request) bool {
+func isXHR(r *http.Request) bool {
 	accept := r.Header.Get("Accept")
 	return !strings.Contains(accept, "text/html")
 }
@@ -38,7 +39,7 @@ func GetStrParam(name string, w http.ResponseWriter, r *http.Request) (string, e
 	strParam, ok := mux.Vars(r)[name]
 
 	if !ok {
-		if !isXHR(w, r) {
+		if !isXHR(r) {
 			http.Redirect(w, r, "/404", http.StatusFound)
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
@@ -56,7 +57,7 @@ func GetIntParam(name string, w http.ResponseWriter, r *http.Request) (int, erro
 	intParam, err := strconv.Atoi(mux.Vars(r)[name])
 
 	if err != nil {
-		if !isXHR(w, r) {
+		if !isXHR(r) {
 			http.Redirect(w, r, "/404", http.StatusFound)
 		} else {
 			w.WriteHeader(http.StatusBadRequest)

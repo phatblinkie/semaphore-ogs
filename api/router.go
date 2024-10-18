@@ -70,6 +70,7 @@ func Route() *mux.Router {
 			webPath += "/"
 		}
 	}
+	
 
 	r.Use(mux.CORSMethodMiddleware(r))
 
@@ -323,6 +324,8 @@ func Route() *mux.Router {
 	projectIntegrationsAPI.HandleFunc("/{integration_id}/values/{value_id}", projects.UpdateIntegrationExtractValue).Methods("PUT")
 	projectIntegrationsAPI.HandleFunc("/{integration_id}/values/{value_id}", projects.DeleteIntegrationExtractValue).Methods("DELETE")
 	projectIntegrationsAPI.HandleFunc("/{integration_id}/values/{value_id}/refs", projects.GetIntegrationExtractValueRefs).Methods("GET")
+
+
 
 	if os.Getenv("DEBUG") == "1" {
 		defer debugPrintRoutes(r)
