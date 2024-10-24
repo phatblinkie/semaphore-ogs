@@ -22,6 +22,7 @@ export default {
   username: 'Username',
   username_required: 'Username is required',
   dashboard: 'Dashboard',
+  systemstatus: 'System Status',
   history: 'History',
   activity: 'Activity',
   settings: 'Settings',

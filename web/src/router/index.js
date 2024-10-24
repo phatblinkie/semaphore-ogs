@@ -18,6 +18,8 @@ import Integrations from '../views/project/Integrations.vue';
 import IntegrationExtractor from '../views/project/IntegrationExtractor.vue';
 import Apps from '../views/Apps.vue';
 
+import Systemstatus from '../views/project/Systemstatus.vue';
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -32,6 +34,10 @@ const routes = [
   {
     path: '/project/:projectId/history',
     component: History,
+  },
+  {
+    path: '/project/:projectId/systemstatus',
+    component: Systemstatus,
   },
   {
     path: '/project/:projectId/activity',
