@@ -94,8 +94,8 @@ tasks:
     desc: Build server binary
     cmds:
       - >-
-        env CGO_ENABLED=0 GOOS={{ .GOOS }} GOARCH={{ .GOARCH }}
-        go build -o bin/semaphore{{ if eq OS "windows" }}.exe{{ end }}
+        {{ if eq OS "linux" }}env CGO_ENABLED=0 GOOS={{ .GOOS }} GOARCH={{ .GOARCH }}{{ end }}
+        go{{ if eq OS "windows" }}.exe{{ end }} build -o bin/semaphore{{ if eq OS "windows" }}.exe{{ end }}
         -tags "netgo"
         -ldflags "-s -w -X {{ .IMPORT }}/util.Ver={{ .VERSION }} -X {{ .IMPORT }}/util.Commit={{ .SHA }} -X {{ .IMPORT }}/util.Date={{ .DATE }}" ./cli
     vars:

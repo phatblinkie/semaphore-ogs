@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import Systemstatus from '../views/project/Systemstatus.vue';
 import Schedule from '../views/project/Schedule.vue';
 import History from '../views/project/History.vue';
 import Activity from '../views/project/Activity.vue';
@@ -17,8 +18,6 @@ import New from '../views/project/New.vue';
 import Integrations from '../views/project/Integrations.vue';
 import IntegrationExtractor from '../views/project/IntegrationExtractor.vue';
 import Apps from '../views/Apps.vue';
-
-import Systemstatus from '../views/project/Systemstatus.vue';
 
 Vue.use(VueRouter);
 

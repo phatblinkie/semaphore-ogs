@@ -1,24 +1,28 @@
 <template>
-  <div v-html="answer"></div>
+  <div id="app">
+    <h1>Vue Apexcharts Demo</h1>
+    <SystemStatus msg="Welcome to Your Vue.js App"/>
+  </div>
 </template>
+
 <script>
-import axios from 'axios';
+import SystemStatus from '@/components/Systemstatus.vue';
 
 export default {
   name: 'App',
-  data() {
-    return {
-      answer: {},
-    };
-  },
-  methods: {
-    async getAnswer() {
-      const { data } = await axios.get('http://192.168.32.133/systemstatus/index.php');
-      this.answer = data;
-    },
-  },
-  beforeMount() {
-    this.getAnswer();
+  components: {
+    SystemStatus,
   },
 };
 </script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>

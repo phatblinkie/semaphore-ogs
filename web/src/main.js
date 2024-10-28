@@ -1,3 +1,4 @@
+import VueApexCharts from 'vue-apexcharts';
 import Vue from 'vue';
 import moment from 'moment';
 import axios from 'axios';
@@ -7,6 +8,7 @@ import router from './router';
 import vuetify from './plugins/vuetify';
 import './assets/scss/main.scss';
 import i18n from './plugins/i18';
+import '@/plugins/apexcharts';
 
 const convert = new Convert();
 
@@ -64,5 +66,6 @@ new Vue({
   router,
   vuetify,
   i18n,
+  VueApexCharts,
   render: (h) => h(App),
 }).$mount('#app');
