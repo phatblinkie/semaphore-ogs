@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <h1>Vue Apexcharts Demo</h1>
     <SystemStatus msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
