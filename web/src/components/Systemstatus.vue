@@ -9,8 +9,8 @@
     <hr>
     <div class="chart-wrapper">
       <apexchart
-        type="bar" width="800"
-        :options="stackedBarChartOptions" :series="barseries">
+        type="bar" width="800" ref="stackedBarChartOptions"
+        :options="stackedBarChartOptions" :series="stackedseries">
       </apexchart>
     </div>
     <hr>
@@ -60,6 +60,7 @@ export default {
           id: 'stacked-bar-chart',
           type: 'bar',
           stacked: true,
+          stackType: '100%',
           height: 350,
           toolbar: {
             show: true,
@@ -70,7 +71,9 @@ export default {
         },
         xaxis: {
           type: 'datetime',
-          categories: ['01/01/2011 GMT', '01/02/2011 GMT', '01/03/2011 GMT', '01/04/2011 GMT', '01/05/2011 GMT', '01/06/2011 GMT'],
+          categories: [],
+          // Initial empty array for categories
+          tickPlacement: 'between',
         },
         plotOptions: {
           bar: {
@@ -81,14 +84,13 @@ export default {
           },
         },
         legend: {
-          position: 'right',
-          offsetY: 40,
+          position: 'top',
         },
         fill: {
           opacity: 1,
         },
       },
-      barseries: [],
+      stackedseries: [],
 
       linechartoptions: {
         chart: {
@@ -139,10 +141,34 @@ export default {
     },
     async fetchBarSeries() {
       try {
-        const response = await axios.get('http://192.168.32.133/systemstatus/graph-stacked.php');
-        this.barseries = response.data;
+        const response = await axios.get('http://192.168.32.133/post/get_7_date_task_results.php');
+        const data = response.data;
+
+        // Log the fetched data to verify it
+        console.log('Fetched Bar Series Data:', data);
+
+        // Ensure categories and series data are properly assigned
+        if (data && data.dates && data.series) {
+          this.stackedBarChartOptions.xaxis.categories = data.dates;
+          // Ensure categories are set correctly
+          this.stackedseries = data.series;
+
+          // Log the updated chart options to verify them
+          console.log('Updated Xaxis Categories:', this.stackedBarChartOptions.xaxis.categories);
+          console.log('Updated Series Data:', this.stackedseries);
+          // const newCategories = ['Positive', 'Neutral', 'Negative'];
+          // newCategories.forEach((category) => {
+          //   this.stackedBarChartOptions.xaxis.categories.push(category);
+          // });
+          // this.series[0].data = [yourData];
+          // this.options.xaxis.categories = [yourCategories]
+          this.$refs.stackedBarChartOptions.refresh();
+          console.log('Updated Xaxis Categories:', this.stackedBarChartOptions.xaxis.categories);
+        } else {
+          console.error('Invalid data format:', data);
+        }
       } catch (error) {
-        console.error('Error fetching barseries data:', error);
+        console.error('Error fetching chart data:', error);
       }
     },
     async fetchLineSeries() {
