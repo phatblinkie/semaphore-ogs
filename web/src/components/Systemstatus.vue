@@ -2,28 +2,28 @@
   <div>
     <div class="chart-wrapper">
       <apexchart
-        width="800" type="bar"
+        width="800" type="bar" ref="graph1options" :key="graph1series.length"
         :options="graph1options" :series="graph1series">
       </apexchart>
     </div>
     <hr>
     <div class="chart-wrapper">
       <apexchart
-        type="bar" width="800" ref="stackedBarChartOptions"
+        type="bar" width="800" ref="stackedBarChartOptions" :key="stackedseries.length"
         :options="stackedBarChartOptions" :series="stackedseries">
       </apexchart>
     </div>
     <hr>
     <div class="chart-wrapper">
       <apexchart
-        width="800" type="line"
+        width="800" type="line" ref="linechartoptions" :key="lineseries.length"
         :options="linechartoptions" :series="lineseries">
       </apexchart>
     </div>
     <hr>
     <div class="chart-wrapper">
       <apexchart
-        width="600" type="donut"
+        width="600" type="donut" ref="donutOptions" :key="donutSeries.length"
         :options="donutOptions" :series="donutSeries">
       </apexchart>
     </div>
@@ -163,7 +163,7 @@ export default {
           // this.series[0].data = [yourData];
           // this.options.xaxis.categories = [yourCategories]
           this.$refs.stackedBarChartOptions.refresh();
-          console.log('Updated Xaxis Categories:', this.stackedBarChartOptions.xaxis.categories);
+          // console.log('Updated Xaxis Categories:', this.stackedBarChartOptions.xaxis.categories);
         } else {
           console.error('Invalid data format:', data);
         }
