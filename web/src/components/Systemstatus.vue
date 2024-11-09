@@ -2,28 +2,26 @@
   <div>
     <div class="chart-wrapper">
       <apexchart
-        width="800" type="bar" ref="graph1options" :key="graph1series.length"
+        width="600" height="350" type="bar" ref="graph1options"
+        :key="graph1series.length || 0"
         :options="graph1options" :series="graph1series">
       </apexchart>
-    </div>
-    <hr>
-    <div class="chart-wrapper">
       <apexchart
-        type="bar" width="800" ref="stackedBarChartOptions" :key="stackedseries.length"
+        width="600" height="350" type="bar" ref="stackedBarChartOptions"
+        :key="stackedseries.length || 0"
         :options="stackedBarChartOptions" :series="stackedseries">
       </apexchart>
     </div>
     <hr>
     <div class="chart-wrapper">
       <apexchart
-        width="800" type="line" ref="linechartoptions" :key="lineseries.length"
+        width="600" height="350" type="line" ref="linechartoptions"
+        :key="lineseries.length || 0"
         :options="linechartoptions" :series="lineseries">
       </apexchart>
-    </div>
-    <hr>
-    <div class="chart-wrapper">
       <apexchart
-        width="600" type="donut" ref="donutOptions" :key="donutSeries.length"
+        width="600" height="350" type="donut" ref="donutOptions"
+        :key="donutSeries.length || 0"
         :options="donutOptions" :series="donutSeries">
       </apexchart>
     </div>
@@ -45,13 +43,13 @@ export default {
           categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         },
         title: {
-          text: 'Ansible Task Success Rates',
+          text: 'Tasks last 6 months',
           align: 'center',
           style: {
             fontSize: '20px',
           },
         },
-        colors: ['#00897b', '#DC143C'],
+        colors: ['#00897b', '#FF4560'],
       },
       graph1series: [],
 
@@ -61,18 +59,16 @@ export default {
           type: 'bar',
           stacked: true,
           stackType: '100%',
-          height: 350,
           toolbar: {
             show: true,
           },
           zoom: {
-            enabled: true,
+            enabled: false,
           },
         },
         xaxis: {
           type: 'datetime',
           categories: [],
-          // Initial empty array for categories
           tickPlacement: 'between',
         },
         plotOptions: {
@@ -83,12 +79,20 @@ export default {
             borderRadiusWhenStacked: 'last',
           },
         },
+        title: {
+          text: 'Tasks last 8 days',
+          align: 'center',
+          style: {
+            fontSize: '20px',
+          },
+        },
         legend: {
-          position: 'top',
+          position: 'bottom',
         },
         fill: {
           opacity: 1,
         },
+        colors: ['#00897b', '#FF4560', '#ffcf12'],
       },
       stackedseries: [],
 
@@ -106,7 +110,7 @@ export default {
             fontSize: '20px',
           },
         },
-        colors: ['#00897b', '#DC143C'],
+        colors: ['#00897b', '#FF4560'],
       },
       lineseries: [],
 
@@ -134,7 +138,8 @@ export default {
     async fetchGraph1Series() {
       try {
         const response = await axios.get('http://192.168.32.133/systemstatus/graph-bar.php');
-        this.graph1series = response.data;
+        this.graph1series = response.data || [];
+        console.log('Fetched Graph1 Series Data:', this.graph1series);
       } catch (error) {
         console.error('Error fetching graph1series data:', error);
       }
@@ -144,26 +149,16 @@ export default {
         const response = await axios.get('http://192.168.32.133/post/get_7_date_task_results.php');
         const data = response.data;
 
-        // Log the fetched data to verify it
         console.log('Fetched Bar Series Data:', data);
 
-        // Ensure categories and series data are properly assigned
         if (data && data.dates && data.series) {
-          this.stackedBarChartOptions.xaxis.categories = data.dates;
-          // Ensure categories are set correctly
-          this.stackedseries = data.series;
+          this.stackedBarChartOptions.xaxis.categories = data.dates || [];
+          this.stackedseries = data.series || [];
 
-          // Log the updated chart options to verify them
           console.log('Updated Xaxis Categories:', this.stackedBarChartOptions.xaxis.categories);
           console.log('Updated Series Data:', this.stackedseries);
-          // const newCategories = ['Positive', 'Neutral', 'Negative'];
-          // newCategories.forEach((category) => {
-          //   this.stackedBarChartOptions.xaxis.categories.push(category);
-          // });
-          // this.series[0].data = [yourData];
-          // this.options.xaxis.categories = [yourCategories]
+
           this.$refs.stackedBarChartOptions.refresh();
-          // console.log('Updated Xaxis Categories:', this.stackedBarChartOptions.xaxis.categories);
         } else {
           console.error('Invalid data format:', data);
         }
@@ -174,7 +169,8 @@ export default {
     async fetchLineSeries() {
       try {
         const response = await axios.get('http://192.168.32.133/systemstatus/graph-line.php');
-        this.lineseries = response.data;
+        this.lineseries = response.data || [];
+        console.log('Fetched Line Series Data:', this.lineseries);
       } catch (error) {
         console.error('Error fetching lineseries data:', error);
       }
@@ -182,7 +178,8 @@ export default {
     async fetchDonutSeries() {
       try {
         const response = await axios.get('http://192.168.32.133/systemstatus/graph-donut.php');
-        this.donutSeries = response.data;
+        this.donutSeries = response.data || [];
+        console.log('Fetched Donut Series Data:', this.donutSeries);
       } catch (error) {
         console.error('Error fetching donutSeries data:', error);
       }
@@ -195,6 +192,6 @@ export default {
 .chart-wrapper {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
 }
 </style>
