@@ -1,17 +1,11 @@
-<template>
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <div>
-      <v-toolbar flat >
-      <v-app-bar-nav-icon @click="showDrawer()"></v-app-bar-nav-icon>
+    <v-toolbar flat >
       <v-toolbar-title>
         System Status
       </v-toolbar-title>
     </v-toolbar>
     <v-tabs show-arrows class="pl-4">
-      <v-tab
-        v-if="projectType === ''"
-        key="systemstatus"
-        :to="`/project/${projectId}/systemstatus`"
-      >System Status</v-tab>
       <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">System Status</v-tab>
       <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
       <v-tab key="Compliancestatus" :to="`/project/${projectId}/compliancestatus`">
