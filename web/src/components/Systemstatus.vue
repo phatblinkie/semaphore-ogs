@@ -1,5 +1,23 @@
 <template>
   <div>
+      <v-toolbar flat >
+      <v-app-bar-nav-icon @click="showDrawer()"></v-app-bar-nav-icon>
+      <v-toolbar-title>
+        System Status
+      </v-toolbar-title>
+    </v-toolbar>
+    <v-tabs show-arrows class="pl-4">
+      <v-tab
+        v-if="projectType === ''"
+        key="systemstatus"
+        :to="`/project/${projectId}/systemstatus`"
+      >System Status</v-tab>
+      <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">System Status</v-tab>
+      <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
+      <v-tab key="Compliancestatus" :to="`/project/${projectId}/compliancestatus`">
+        Compliance Status</v-tab>
+    </v-tabs>
+
     <div class="chart-wrapper">
       <apexchart
         width="600" height="350" type="bar" ref="graph1options"
@@ -35,12 +53,13 @@ export default {
   name: 'SystemStatus',
   data() {
     return {
+      projectId: null, // Initialize projectId
       graph1options: {
         chart: {
           id: 'vuechart-example1',
         },
         xaxis: {
-          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          categories: [],
         },
         title: {
           text: 'Tasks last 6 months',
@@ -49,7 +68,7 @@ export default {
             fontSize: '20px',
           },
         },
-        colors: ['#00897b', '#FF4560'],
+        colors: ['#00897b', '#FF4560', '#ffcf12'],
       },
       graph1series: [],
 
@@ -110,7 +129,7 @@ export default {
             fontSize: '20px',
           },
         },
-        colors: ['#00897b', '#FF4560'],
+        colors: ['#00897b', '#FF4560', '#00E396', '#775DD0', '#FEB019'],
       },
       lineseries: [],
 
@@ -128,20 +147,41 @@ export default {
       donutSeries: [],
     };
   },
+
   mounted() {
+    this.getProjectIdFromUrl();
     this.fetchGraph1Series();
     this.fetchBarSeries();
     this.fetchLineSeries();
     this.fetchDonutSeries();
   },
   methods: {
+    getProjectIdFromUrl() {
+      // Get the current URL
+      const url = window.location.href;
+      // Split the URL into parts based on the '/'
+      const parts = url.split('/');
+      // Extract the projectId (assuming it is the 4th part in the URL structure)
+      this.projectId = parts[4];
+    },
     async fetchGraph1Series() {
       try {
-        const response = await axios.get('http://192.168.32.133/systemstatus/graph-bar.php');
-        this.graph1series = response.data || [];
-        console.log('Fetched Graph1 Series Data:', this.graph1series);
+        // const response = await axios.get('http://192.168.32.133/systemstatus/graph-bar.php');
+        const response = await axios.get('http://192.168.32.133/post/get_barchart_data.php');
+        const data = response.data;
+        if (data && data.dates && data.series) {
+          this.graph1options.xaxis.categories = data.dates || [];
+          this.graph1series = data.series || [];
+
+          // console.log('Updated Xaxis Categories:', this.graph1options.xaxis.categories);
+          // console.log('Updated Series Data:', this.graph1series);
+
+          this.$refs.graph1options.refresh();
+        } else {
+          console.error('Invalid data format:', data);
+        }
       } catch (error) {
-        console.error('Error fetching graph1series data:', error);
+        console.error('Error fetching chart data:', error);
       }
     },
     async fetchBarSeries() {
@@ -186,6 +226,7 @@ export default {
     },
   },
 };
+
 </script>
 
 <style scoped>
