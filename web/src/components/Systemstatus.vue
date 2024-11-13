@@ -160,8 +160,8 @@ export default {
     },
     async fetchGraph1Series() {
       try {
-        // const response = await axios.get('http://192.168.32.133/systemstatus/graph-bar.php');
-        const response = await axios.get('http://192.168.32.133/post/get_barchart_data.php');
+        // const response = await axios.get('/systemstatus/graph-bar.php');
+        const response = await axios.get('/post/get_barchart_data.php');
         const data = response.data;
         if (data && data.dates && data.series) {
           this.graph1options.xaxis.categories = data.dates || [];
@@ -180,7 +180,7 @@ export default {
     },
     async fetchBarSeries() {
       try {
-        const response = await axios.get('http://192.168.32.133/post/get_7_date_task_results.php');
+        const response = await axios.get('/post/get_7_date_task_results.php');
         const data = response.data;
 
         console.log('Fetched Bar Series Data:', data);
@@ -202,7 +202,7 @@ export default {
     },
     async fetchLineSeries() {
       try {
-        const response = await axios.get('http://192.168.32.133/systemstatus/graph-line.php');
+        const response = await axios.get('/systemstatus/graph-line.php');
         this.lineseries = response.data || [];
         console.log('Fetched Line Series Data:', this.lineseries);
       } catch (error) {
@@ -211,7 +211,7 @@ export default {
     },
     async fetchDonutSeries() {
       try {
-        const response = await axios.get('http://192.168.32.133/systemstatus/graph-donut.php');
+        const response = await axios.get('/systemstatus/graph-donut.php');
         this.donutSeries = response.data || [];
         console.log('Fetched Donut Series Data:', this.donutSeries);
       } catch (error) {
