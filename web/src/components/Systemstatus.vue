@@ -202,7 +202,7 @@ export default {
     },
     async fetchLineSeries() {
       try {
-        const response = await axios.get('/systemstatus/graph-line.php');
+        const response = await axios.get('/post/graph-line.php');
         this.lineseries = response.data || [];
         console.log('Fetched Line Series Data:', this.lineseries);
       } catch (error) {
@@ -211,7 +211,7 @@ export default {
     },
     async fetchDonutSeries() {
       try {
-        const response = await axios.get('/systemstatus/graph-donut.php');
+        const response = await axios.get('/post/graph-donut.php');
         this.donutSeries = response.data || [];
         console.log('Fetched Donut Series Data:', this.donutSeries);
       } catch (error) {
