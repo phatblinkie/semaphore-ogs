@@ -1,0 +1,27 @@
+<template>
+  <div id="app">
+    <Patchstatus msg="Welcome to Your Vue.js App" />
+  </div>
+</template>
+
+<script>
+import Patchstatus from '@/components/patchstatus.vue';
+
+export default {
+  name: 'App',
+  components: {
+    Patchstatus,
+  },
+};
+</script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
