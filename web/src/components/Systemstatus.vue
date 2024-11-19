@@ -1,40 +1,64 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <div>
-    <v-toolbar flat >
-      <v-toolbar-title>
-        System Status
-      </v-toolbar-title>
+    <v-toolbar flat>
+      <v-toolbar-title> System Status </v-toolbar-title>
     </v-toolbar>
     <v-tabs show-arrows class="pl-4">
-      <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">System Status</v-tab>
-      <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
+      <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`"
+        >System Status</v-tab
+      >
+      <v-tab key="Graphs" :to="`/project/${projectId}/graphs`">graphs</v-tab>
+      <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`"
+        >Patch Status</v-tab
+      >
       <v-tab key="Compliancestatus" :to="`/project/${projectId}/compliancestatus`">
-        Compliance Status</v-tab>
+        Compliance Status</v-tab
+      >
     </v-tabs>
 
     <div class="chart-wrapper">
       <apexchart
-        width="600" height="350" type="bar" ref="graph1options"
+        width="600"
+        height="350"
+        type="bar"
+        ref="graph1options"
         :key="graph1series.length || 0"
-        :options="graph1options" :series="graph1series">
+        :options="graph1options"
+        :series="graph1series"
+      >
       </apexchart>
       <apexchart
-        width="600" height="350" type="bar" ref="stackedBarChartOptions"
+        width="600"
+        height="350"
+        type="bar"
+        ref="stackedBarChartOptions"
         :key="stackedseries.length || 0"
-        :options="stackedBarChartOptions" :series="stackedseries">
+        :options="stackedBarChartOptions"
+        :series="stackedseries"
+      >
       </apexchart>
     </div>
-    <hr>
+    <hr />
     <div class="chart-wrapper">
       <apexchart
-        width="600" height="350" type="line" ref="linechartoptions"
+        width="600"
+        height="350"
+        type="line"
+        ref="linechartoptions"
         :key="lineseries.length || 0"
-        :options="linechartoptions" :series="lineseries">
+        :options="linechartoptions"
+        :series="lineseries"
+      >
       </apexchart>
       <apexchart
-        width="600" height="350" type="donut" ref="donutOptions"
+        width="600"
+        height="350"
+        type="donut"
+        ref="donutOptions"
         :key="donutSeries.length || 0"
-        :options="donutOptions" :series="donutSeries">
+        :options="donutOptions"
+        :series="donutSeries"
+      >
       </apexchart>
     </div>
   </div>
@@ -114,7 +138,20 @@ export default {
           id: 'vuechart-example2',
         },
         xaxis: {
-          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          categories: [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+          ],
         },
         title: {
           text: 'Ansible Task Success Rates',
@@ -189,7 +226,10 @@ export default {
           this.stackedBarChartOptions.xaxis.categories = data.dates || [];
           this.stackedseries = data.series || [];
 
-          console.log('Updated Xaxis Categories:', this.stackedBarChartOptions.xaxis.categories);
+          console.log(
+            'Updated Xaxis Categories:',
+            this.stackedBarChartOptions.xaxis.categories,
+          );
           console.log('Updated Series Data:', this.stackedseries);
 
           this.$refs.stackedBarChartOptions.refresh();
@@ -220,7 +260,6 @@ export default {
     },
   },
 };
-
 </script>
 
 <style scoped>

@@ -18,6 +18,9 @@ import New from '../views/project/New.vue';
 import Integrations from '../views/project/Integrations.vue';
 import IntegrationExtractor from '../views/project/IntegrationExtractor.vue';
 import Apps from '../views/Apps.vue';
+import Graphs from '../components/graphs.vue';
+import Patchstatus from '../components/patchstatus.vue';
+import Compliance from '../components/compliance.vue';
 
 Vue.use(VueRouter);
 
@@ -37,6 +40,18 @@ const routes = [
   {
     path: '/project/:projectId/systemstatus',
     component: Systemstatus,
+  },
+  {
+    path: '/project/:projectId/graphs',
+    component: Graphs,
+  },
+  {
+    path: '/project/:projectId/patchstatus',
+    component: Patchstatus,
+  },
+  {
+    path: '/project/:projectId/compliancestatus',
+    component: Compliance,
   },
   {
     path: '/project/:projectId/activity',
