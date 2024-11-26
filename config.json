@@ -1,6 +1,6 @@
 {
  	"mysql": {
- 		"host": "192.168.59.131:3306",
+ 		"host": "localhost:3306",
  		"user": "semaphore_user",
  		"pass": "DFyuqwhjty34JK@#23@#",
  		"name": "semaphore_db",
