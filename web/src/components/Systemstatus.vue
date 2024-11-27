@@ -37,6 +37,19 @@
           <span>{{ item.disk_capacity }}%</span>
         </div>
       </template>
+      <template v-slot:item.proc_usage="{ item }">
+        <div class="proc-meter">
+          <meter
+            :value="roundProcUsage(item.proc_usage)"
+            :min="0"
+            :max="100"
+            :low="70"
+            :high="90"
+            :optimum="0">
+          </meter>
+          <span>{{ roundProcUsage(item.proc_usage) }}%</span>
+        </div>
+      </template>
     </v-data-table>
   </div>
 </template>
@@ -76,6 +89,9 @@ export default {
           console.error('Error fetching data:', error);
         });
     },
+    roundProcUsage(value) {
+      return Math.round(value);
+    },
   },
 };
 </script>
@@ -94,11 +110,11 @@ export default {
   text-align: left; /* Align text to the left in table headers and cells */
   padding: 8px; /* Optional: add padding to table cells for better spacing */
 }
-.disk-meter {
+.disk-meter, .proc-meter {
   display: flex;
   align-items: center;
 }
-.disk-meter meter {
+.disk-meter meter, .proc-meter meter {
   width: 100%;
   height: 20px;
   margin-right: 8px;
