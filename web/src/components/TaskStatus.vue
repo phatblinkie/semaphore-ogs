@@ -18,6 +18,7 @@ const TaskStatus = Object.freeze({
   ERROR: 'error',
   STOPPING: 'stopping',
   STOPPED: 'stopped',
+  PONG: 'pong',
 });
 
 export default {
@@ -47,6 +48,8 @@ export default {
           return 'mdi-check-circle';
         case TaskStatus.WAITING_CONFIRMATION:
           return 'mdi-pause-circle';
+        case TaskStatus.PONG:
+          return 'mdi-check';
         default:
           throw new Error(`Unknown task status ${status}`);
       }
@@ -72,6 +75,8 @@ export default {
           return 'Confirmed';
         case TaskStatus.WAITING_CONFIRMATION:
           return 'Waiting confirmation';
+        case TaskStatus.PONG:
+          return 'Success';
         default:
           throw new Error(`Unknown task status ${status}`);
       }
@@ -97,6 +102,8 @@ export default {
           return 'warning';
         case TaskStatus.WAITING_CONFIRMATION:
           return 'warning';
+        case TaskStatus.PONG:
+          return 'success';
         default:
           throw new Error(`Unknown task status ${status}`);
       }
