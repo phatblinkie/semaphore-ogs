@@ -19,6 +19,7 @@
       :headers="headers"
       :items="items"
       :items-per-page="20"
+      :options.sync="tableOptions"
       class="mt-4"
     >
       <template v-slot:item.ansible_ping="{ item }">
@@ -50,6 +51,15 @@
           <span>{{ roundProcUsage(item.proc_usage) }}%</span>
         </div>
       </template>
+      <template v-slot:item.app_check="{ item }">
+        <AppCheckStatus :status="item.app_check"/>
+      </template>
+      <template v-slot:item.last_responded="{ item }">
+        <span>{{ formatTimestamp(item.last_responded) }}</span>
+      </template>
+      <template v-slot:item.uptime="{ item }">
+        <span>{{ formatUptime(item.uptime) }}</span>
+      </template>
     </v-data-table>
   </div>
 </template>
@@ -57,10 +67,12 @@
 <script>
 import axios from 'axios';
 import TaskStatus from '@/components/TaskStatus.vue';
+import AppCheckStatus from '@/components/AppCheckStatus.vue';
 
 export default {
   components: {
     TaskStatus,
+    AppCheckStatus,
   },
   data() {
     return {
@@ -71,26 +83,50 @@ export default {
         { text: 'Disk Usage', value: 'disk_capacity' },
         { text: 'Proc Usage', value: 'proc_usage' },
         { text: 'App Check', value: 'app_check' },
+        { text: 'Last Responded', value: 'last_responded' },
+        { text: 'Uptime', value: 'uptime' },
       ],
       items: [], // This will be populated with data from the JSON source
+      tableOptions: {
+        sortBy: ['hostname'],
+        sortDesc: [false],
+      },
     };
   },
   mounted() {
     this.fetchData();
+    this.interval = setInterval(this.fetchData, 15000); // Refresh data every 15 seconds
+  },
+  beforeDestroy() {
+    clearInterval(this.interval); // Clear the interval when the component is destroyed
   },
   methods: {
     fetchData() {
       axios
         .get('/post/get_system_status.php') // Replace with your actual JSON source URL
         .then((response) => {
-          this.items = response.data; // Assuming the JSON data is an array of objects
+          this.items = Array.isArray(response.data) ? response.data : [];
+          // Ensure items is always an array
         })
         .catch((error) => {
           console.error('Error fetching data:', error);
+          this.items = []; // Set items to an empty array on error
         });
     },
     roundProcUsage(value) {
       return Math.round(value);
+    },
+    formatTimestamp(timestamp) {
+      if (!timestamp) return 'N/A'; // Return 'N/A' if timestamp is undefined or null
+      const date = new Date(timestamp.replace(' ', 'T')); // Replace space with 'T' to make it ISO 8601 compliant
+      return date.toLocaleString(); // Format the date as a local string
+    },
+    formatUptime(uptime) {
+      if (uptime === null) return 'N/A'; // Return 'N/A' if uptime is null
+      const seconds = uptime % 60;
+      const minutes = Math.floor((uptime % 3600) / 60);
+      const hours = Math.floor(uptime / 3600);
+      return `${hours}h ${minutes}m ${seconds}s`;
     },
   },
 };

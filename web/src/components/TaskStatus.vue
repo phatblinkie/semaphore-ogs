@@ -19,6 +19,7 @@ const TaskStatus = Object.freeze({
   STOPPING: 'stopping',
   STOPPED: 'stopped',
   PONG: 'pong',
+  UNREACHABLE: 'unreachable',
 });
 
 export default {
@@ -50,6 +51,8 @@ export default {
           return 'mdi-pause-circle';
         case TaskStatus.PONG:
           return 'mdi-check';
+        case TaskStatus.UNREACHABLE:
+          return 'mdi-information';
         default:
           throw new Error(`Unknown task status ${status}`);
       }
@@ -77,6 +80,8 @@ export default {
           return 'Waiting confirmation';
         case TaskStatus.PONG:
           return 'Success';
+        case TaskStatus.UNREACHABLE:
+          return 'Failed';
         default:
           throw new Error(`Unknown task status ${status}`);
       }
@@ -104,6 +109,8 @@ export default {
           return 'warning';
         case TaskStatus.PONG:
           return 'success';
+        case TaskStatus.UNREACHABLE:
+          return 'error';
         default:
           throw new Error(`Unknown task status ${status}`);
       }
