@@ -3,7 +3,6 @@ package tasks
 import (
 	"encoding/json"
 	"fmt"
-	"maps"
 	"os"
 
 	"path"
@@ -110,8 +109,6 @@ func (t *LocalJob) getEnvironmentExtraVarsJSON(username string, incomingVersion 
 	}
 	t.Secret = "{}"
 
-	maps.Copy(extraVars, extraSecretVars)
-
 	taskDetails := make(map[string]interface{})
 
 	taskDetails["id"] = t.Task.ID
@@ -122,6 +119,7 @@ func (t *LocalJob) getEnvironmentExtraVarsJSON(username string, incomingVersion 
 
 	taskDetails["username"] = username
 	taskDetails["url"] = t.Task.GetUrl()
+	taskDetails["project_id"] = t.Task.ProjectID // Add project ID here
 
 	if t.Template.Type != db.TemplateTask {
 		taskDetails["type"] = t.Template.Type
@@ -137,13 +135,12 @@ func (t *LocalJob) getEnvironmentExtraVarsJSON(username string, incomingVersion 
 	vars["task_details"] = taskDetails
 	extraVars["semaphore_vars"] = vars
 
-	ev, err := json.Marshal(extraVars)
+	extraVarsBytes, err := json.Marshal(extraVars)
 	if err != nil {
 		return
 	}
 
-	str = string(ev)
-
+	str = string(extraVarsBytes)
 	return
 }
 
