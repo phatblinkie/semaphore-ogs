@@ -76,7 +76,7 @@ export default {
   },
   data() {
     return {
-      projectId: 1, // Replace this with actual project ID extraction logic if needed
+      projectId: this.$route.params.projectId, // Extract projectId from route parameters
       headers: [
         { text: 'Hostname', value: 'hostname' },
         { text: 'Ansible Ping', value: 'ansible_ping' },
@@ -103,7 +103,7 @@ export default {
   methods: {
     fetchData() {
       axios
-        .get('/post/get_system_status.php') // Replace with your actual JSON source URL
+        .get(`/post/get_system_status.php?project_id=${this.projectId}`) // Use projectId to fetch data
         .then((response) => {
           this.items = Array.isArray(response.data) ? response.data : [];
           // Ensure items is always an array
