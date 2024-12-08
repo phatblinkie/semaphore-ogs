@@ -1,45 +1,55 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
-    <div>
-      <v-toolbar flat >
-        <v-toolbar-title>
-          Graphs
-        </v-toolbar-title>
-      </v-toolbar>
-      <v-tabs show-arrows class="pl-4">
-        <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">System Status</v-tab>
-        <v-tab key="Graphs" :to="`/project/${projectId}/graphs`">graphs</v-tab>
-        <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
-        <v-tab key="Compliancestatus" :to="`/project/${projectId}/compliancestatus`">
-          Compliance Status</v-tab>
-      </v-tabs>
+  <div>
+    <v-toolbar flat>
+      <v-toolbar-title>Graphs</v-toolbar-title>
+    </v-toolbar>
+    <v-tabs show-arrows class="pl-4">
+      <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">System Status</v-tab>
+      <v-tab key="Graphs" :to="`/project/${projectId}/graphs`">Graphs</v-tab>
+      <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
+      <v-tab key="Compliancestatus" :to="`/project/${projectId}/compliancestatus`"
+      >Compliance Status</v-tab>
+    </v-tabs>
 
-      <div class="chart-wrapper">
-        <apexchart
-          width="600" height="350" type="bar" ref="graph1options"
-          :key="graph1series.length || 0"
-          :options="graph1options" :series="graph1series">
-        </apexchart>
-        <apexchart
-          width="600" height="350" type="bar" ref="stackedBarChartOptions"
-          :key="stackedseries.length || 0"
-          :options="stackedBarChartOptions" :series="stackedseries">
-        </apexchart>
-      </div>
-      <hr>
-      <div class="chart-wrapper">
-        <apexchart
-          width="600" height="350" type="line" ref="linechartoptions"
-          :key="lineseries.length || 0"
-          :options="linechartoptions" :series="lineseries">
-        </apexchart>
-        <apexchart
-          width="600" height="350" type="donut" ref="donutOptions"
-          :key="donutSeries.length || 0"
-          :options="donutOptions" :series="donutSeries">
-        </apexchart>
-      </div>
+    <div class="chart-wrapper">
+      <apexchart
+        width="600"
+        height="350"
+        type="bar"
+        :options="graph1options"
+        :series="graph1series"
+        :key="graph1Key"
+      ></apexchart>
+      <apexchart
+        width="600"
+        height="350"
+        type="bar"
+        :options="stackedBarChartOptions"
+        :series="stackedseries"
+        :key="stackedBarKey"
+      ></apexchart>
     </div>
-  </template>
+    <hr>
+    <div class="chart-wrapper">
+      <apexchart
+        width="600"
+        height="350"
+        type="line"
+        :options="linechartoptions"
+        :series="lineseries"
+        :key="lineKey"
+      ></apexchart>
+      <apexchart
+        width="600"
+        height="350"
+        type="donut"
+        :options="donutOptions"
+        :series="donutSeries"
+        :key="donutKey"
+      ></apexchart>
+    </div>
+  </div>
+</template>
 
 <script>
 import axios from 'axios';
@@ -66,6 +76,7 @@ export default {
         colors: ['#00897b', '#FF4560', '#ffcf12'],
       },
       graph1series: [],
+      graph1Key: 0, // Add a key to force re-render
 
       stackedBarChartOptions: {
         chart: {
@@ -109,6 +120,7 @@ export default {
         colors: ['#00897b', '#FF4560', '#ffcf12'],
       },
       stackedseries: [],
+      stackedBarKey: 0, // Add a key to force re-render
 
       linechartoptions: {
         chart: {
@@ -127,6 +139,7 @@ export default {
         colors: ['#00897b', '#FF4560', '#00E396', '#775DD0', '#FEB019'],
       },
       lineseries: [],
+      lineKey: 0, // Add a key to force re-render
 
       donutOptions: {
         labels: ['Redhat 9', 'Windows 10', 'Windows Server 2019', 'Cisco', 'Unknown'],
@@ -140,6 +153,7 @@ export default {
         },
       },
       donutSeries: [],
+      donutKey: 0, // Add a key to force re-render
     };
   },
 
@@ -161,17 +175,12 @@ export default {
     },
     async fetchGraph1Series() {
       try {
-        // const response = await axios.get('/systemstatus/graph-bar.php');
         const response = await axios.get('/post/get_barchart_data.php');
         const data = response.data;
         if (data && data.dates && data.series) {
           this.graph1options.xaxis.categories = data.dates || [];
           this.graph1series = data.series || [];
-
-          // console.log('Updated Xaxis Categories:', this.graph1options.xaxis.categories);
-          // console.log('Updated Series Data:', this.graph1series);
-
-          this.$refs.graph1options.refresh();
+          this.graph1Key += 1; // Update the key to force re-render
         } else {
           console.error('Invalid data format:', data);
         }
@@ -183,17 +192,10 @@ export default {
       try {
         const response = await axios.get('/post/get_7_date_task_results.php');
         const data = response.data;
-
-        console.log('Fetched Bar Series Data:', data);
-
         if (data && data.dates && data.series) {
           this.stackedBarChartOptions.xaxis.categories = data.dates || [];
           this.stackedseries = data.series || [];
-
-          console.log('Updated Xaxis Categories:', this.stackedBarChartOptions.xaxis.categories);
-          console.log('Updated Series Data:', this.stackedseries);
-
-          this.$refs.stackedBarChartOptions.refresh();
+          this.stackedBarKey += 1; // Update the key to force re-render
         } else {
           console.error('Invalid data format:', data);
         }
@@ -205,7 +207,7 @@ export default {
       try {
         const response = await axios.get('/post/graph-line.php');
         this.lineseries = response.data || [];
-        console.log('Fetched Line Series Data:', this.lineseries);
+        this.lineKey += 1; // Update the key to force re-render
       } catch (error) {
         console.error('Error fetching lineseries data:', error);
       }
@@ -214,20 +216,19 @@ export default {
       try {
         const response = await axios.get('/post/graph-donut.php');
         this.donutSeries = response.data || [];
-        console.log('Fetched Donut Series Data:', this.donutSeries);
+        this.donutKey += 1; // Update the key to force re-render
       } catch (error) {
         console.error('Error fetching donutSeries data:', error);
       }
     },
   },
 };
-
 </script>
 
-  <style scoped>
-  .chart-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: left;
-  }
-  </style>
+<style scoped>
+.chart-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+</style>

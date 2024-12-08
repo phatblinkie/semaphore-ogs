@@ -14,6 +14,7 @@ const convert = new Convert();
 
 axios.defaults.baseURL = document.baseURI;
 Vue.config.productionTip = false;
+Vue.component('apexchart', VueApexCharts);
 
 Vue.filter('formatDate', (value) => {
   if (!value) {

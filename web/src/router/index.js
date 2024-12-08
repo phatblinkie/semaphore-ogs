@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Systemstatus from '../views/project/Systemstatus.vue';
+import HostGraphs from '../views/project/HostGraphs.vue';
 import Schedule from '../views/project/Schedule.vue';
 import History from '../views/project/History.vue';
 import Activity from '../views/project/Activity.vue';
@@ -40,6 +41,10 @@ const routes = [
   {
     path: '/project/:projectId/systemstatus',
     component: Systemstatus,
+  },
+  {
+    path: '/project/:projectId/host/:hostname',
+    component: HostGraphs,
   },
   {
     path: '/project/:projectId/graphs',

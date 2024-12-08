@@ -22,6 +22,10 @@
       :options.sync="tableOptions"
       class="mt-4"
     >
+      <template v-slot:item.hostname="{ item }">
+        <router-link :to="`/project/${projectId}/host/${item.hostname}`"
+        >{{ item.hostname }}</router-link>
+      </template>
       <template v-slot:item.ansible_ping="{ item }">
         <TaskStatus :status="item.ansible_ping"/>
       </template>
