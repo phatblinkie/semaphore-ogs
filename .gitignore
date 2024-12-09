@@ -7,6 +7,7 @@ web/public/html/**/*.*
 web/public/fonts/*.*
 web/.nyc_output
 api/public/**/*
+api/public/index.html
 /config.json
 /.dredd/config.json
 /database.boltdb
@@ -18,6 +19,7 @@ node_modules/
 /.idea/
 /semaphore.iml
 /bin/
+bin/semaphore
 
 /vendor/
 /coverage.out

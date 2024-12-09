@@ -11,15 +11,15 @@
         Compliance Status
       </v-tab>
     </v-tabs>
-
-    <v-container>
+    <br>
+    <table>
       <v-row>
         <v-btn @click="setTimeFrame('today')">Today</v-btn>
         <v-btn @click="setTimeFrame('week')">7 Days</v-btn>
         <v-btn @click="setTimeFrame('month')">30 Days</v-btn>
         <v-btn @click="setTimeFrame('90days')">90 Days</v-btn>
       </v-row>
-      <v-row>
+      <v-row class="left-aligned">
         <v-col cols="6">
           <apexchart
             type="line"
@@ -41,7 +41,7 @@
           ></apexchart>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row class="left-aligned">
         <v-col cols="6">
           <apexchart
             type="line"
@@ -53,7 +53,7 @@
           ></apexchart>
         </v-col>
       </v-row>
-    </v-container>
+    </table>
   </div>
 </template>
 
@@ -186,5 +186,8 @@ export default {
 <style scoped>
 .chart-wrapper {
   height: 400px;
+}
+.left-aligned {
+  justify-content: flex-start;
 }
 </style>
