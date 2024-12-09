@@ -503,6 +503,21 @@
   <v-app v-else></v-app>
 </template>
 <style lang="scss">
+.theme--dark svg text {
+  fill: white !important;
+}
+.theme--dark .apexcharts-legend-text {
+  color: white !important;
+  fill: white !important;
+}
+
+.v-theme--dark svg text {
+  fill: white !important;
+}
+.v-theme--dark .apexcharts-legend-text {
+  color: white !important;
+  fill: white !important;
+}
 
 .v-alert__wrapper {
   overflow: auto;

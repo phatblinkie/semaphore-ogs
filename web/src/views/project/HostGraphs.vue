@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-toolbar flat>
-      <v-toolbar-title>Host Graphs</v-toolbar-title>
+      <v-toolbar-title>Graphs for Host: {{ hostname }}</v-toolbar-title>
     </v-toolbar>
     <v-tabs show-arrows class="pl-4">
       <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">System Status</v-tab>
@@ -12,7 +12,6 @@
       </v-tab>
     </v-tabs>
 
-    <h1>Graphs for Host: {{ hostname }}</h1>
     <v-container>
       <v-row>
         <v-btn @click="setTimeFrame('today')">Today</v-btn>
@@ -21,19 +20,21 @@
         <v-btn @click="setTimeFrame('90days')">90 Days</v-btn>
       </v-row>
       <v-row>
-        <v-col>
+        <v-col cols="6">
           <apexchart
             type="line"
+            width="600"
+            height="350"
             :options="diskChartOptions"
             :series="diskSeries"
             :key="diskChartKey"
           ></apexchart>
         </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
+        <v-col cols="6">
           <apexchart
             type="line"
+            width="600"
+            height="350"
             :options="procChartOptions"
             :series="procSeries"
             :key="procChartKey"
@@ -41,9 +42,11 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col>
+        <v-col cols="6">
           <apexchart
             type="line"
+            width="600"
+            height="350"
             :options="uptimeChartOptions"
             :series="uptimeSeries"
             :key="uptimeChartKey"
