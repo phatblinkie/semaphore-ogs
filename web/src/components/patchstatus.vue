@@ -1,4 +1,4 @@
-<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+<template>
   <div>
     <v-toolbar flat>
       <v-toolbar-title>Patch Status</v-toolbar-title>
@@ -11,48 +11,87 @@
         Compliance Status
       </v-tab>
     </v-tabs>
-
-    <div class="chart-wrapper">
-      <apexchart
-        width="600"
-        height="350"
-        type="bar"
-        ref="graph1options"
-        :key="graph1series.length || 0"
-        :options="graph1options"
-        :series="graph1series"
-      ></apexchart>
-      <apexchart
-        width="600"
-        height="350"
-        type="bar"
-        ref="stackedBarChartOptions"
-        :key="stackedseries.length || 0"
-        :options="stackedBarChartOptions"
-        :series="stackedseries"
-      ></apexchart>
-    </div>
-    <hr>
-    <div class="chart-wrapper">
-      <apexchart
-        width="600"
-        height="350"
-        type="line"
-        ref="linechartoptions"
-        :key="lineseries.length || 0"
-        :options="linechartoptions"
-        :series="lineseries"
-      ></apexchart>
-      <apexchart
-        width="600"
-        height="350"
-        type="donut"
-        ref="donutOptions"
-        :key="donutSeries.length || 0"
-        :options="donutOptions"
-        :series="donutSeries"
-      ></apexchart>
-    </div>
+    <v-container>
+      <v-row>
+        <v-col cols="4">
+          <h2>Hosts</h2>
+          <v-list dense>
+            <v-list-item
+              v-for="host in hosts"
+              :key="host.hostname"
+              @click="fetchHostDetails(host.hostname)"
+            >
+              <v-list-item-content>
+                <v-list-item-title>{{ host.hostname }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-col>
+        <v-col cols="8">
+          <h2>Host Details</h2>
+          <div v-if="hostDetails">
+            <v-simple-table dense>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left">Field</th>
+                    <th class="text-left">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Hostname</strong></td>
+                    <td>{{ hostDetails.hostname }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Changed</strong></td>
+                    <td>{{ hostDetails.changed }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Failed</strong></td>
+                    <td>{{ hostDetails.failed }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Message</strong></td>
+                    <td>{{ hostDetails.msg }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Return Code</strong></td>
+                    <td>{{ hostDetails.rc }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Project ID</strong></td>
+                    <td>{{ hostDetails.project_id }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Task ID</strong></td>
+                    <td>{{ hostDetails.task_id }}</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+            <h3>Results</h3>
+            <v-simple-table dense>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left">Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="result in hostDetails.results" :key="result">
+                    <td>{{ result }}</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </div>
+          <div v-else>
+            <p>Select a host to see details.</p>
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -60,168 +99,41 @@
 import axios from 'axios';
 
 export default {
-  name: 'Patchstatus',
+  name: 'PatchStatus',
+  props: {
+    projectId: {
+      type: Number,
+      required: true,
+    },
+  },
   data() {
     return {
-      projectId: null, // Initialize projectId
-      graph1options: {
-        chart: {
-          id: 'vuechart-example1',
-        },
-        xaxis: {
-          categories: [],
-        },
-        title: {
-          text: 'Tasks last 6 months',
-          align: 'center',
-          style: {
-            fontSize: '20px',
-          },
-        },
-        colors: ['#00897b', '#FF4560', '#ffcf12'],
-      },
-      graph1series: [],
-
-      stackedBarChartOptions: {
-        chart: {
-          id: 'stacked-bar-chart',
-          type: 'bar',
-          stacked: true,
-          stackType: '100%',
-          toolbar: {
-            show: true,
-          },
-          zoom: {
-            enabled: false,
-          },
-        },
-        xaxis: {
-          type: 'datetime',
-          categories: [],
-          tickPlacement: 'between',
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            borderRadius: 10,
-            borderRadiusApplication: 'end',
-            borderRadiusWhenStacked: 'last',
-          },
-        },
-        title: {
-          text: 'Tasks last 8 days',
-          align: 'center',
-          style: {
-            fontSize: '20px',
-          },
-        },
-        legend: {
-          position: 'bottom',
-        },
-        fill: {
-          opacity: 1,
-        },
-        colors: ['#00897b', '#FF4560', '#ffcf12'],
-      },
-      stackedseries: [],
-
-      linechartoptions: {
-        chart: {
-          id: 'vuechart-example2',
-        },
-        xaxis: {
-          categories: [
-            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-          ],
-        },
-        title: {
-          text: 'Ansible Task Success Rates',
-          align: 'center',
-          style: {
-            fontSize: '20px',
-          },
-        },
-        colors: ['#00897b', '#FF4560', '#00E396', '#775DD0', '#FEB019'],
-      },
-      lineseries: [],
-
-      donutOptions: {
-        labels: [
-          'Redhat 9', 'Windows 10', 'Windows Server 2019', 'Cisco', 'Unknown',
-        ],
-        colors: ['#FF4560', '#008FFB', '#00E396', '#775DD0', '#FEB019'],
-        title: {
-          text: 'OGS Operating Systems',
-          align: 'center',
-          style: {
-            fontSize: '20px',
-          },
-        },
-      },
-      donutSeries: [],
+      hosts: [],
+      hostDetails: null,
     };
   },
-
-  mounted() {
-    this.getProjectIdFromUrl();
-    this.fetchGraph1Series();
-    this.fetchBarSeries();
-    this.fetchLineSeries();
-    this.fetchDonutSeries();
+  created() {
+    this.fetchHosts();
   },
   methods: {
-    getProjectIdFromUrl() {
-      // Get the current URL
-      const url = window.location.href;
-      // Split the URL into parts based on the '/'
-      const parts = url.split('/');
-      // Extract the projectId (assuming it is the 4th part in the URL structure)
-      this.projectId = parts[4];
-    },
-    async fetchGraph1Series() {
+    async fetchHosts() {
       try {
-        const response = await axios.get('/post/get_barchart_data.php');
-        const data = response.data;
-        if (data && data.dates && data.series) {
-          this.graph1options.xaxis.categories = data.dates || [];
-          this.graph1series = data.series || [];
-          this.$refs.graph1options.refresh();
-        } else {
-          console.error('Invalid data format:', data);
-        }
+        const response = await axios.get(
+          `/post/get_patch_status_hosts.php?project_id=${this.projectId}`,
+        );
+        this.hosts = response.data;
       } catch (error) {
-        console.error('Error fetching chart data:', error);
+        console.error('Error fetching hosts:', error);
       }
     },
-    async fetchBarSeries() {
+    async fetchHostDetails(hostname) {
       try {
-        const response = await axios.get('/post/get_7_date_task_results.php');
-        const data = response.data;
-        if (data && data.dates && data.series) {
-          this.stackedBarChartOptions.xaxis.categories = data.dates || [];
-          this.stackedseries = data.series || [];
-          this.$refs.stackedBarChartOptions.refresh();
-        } else {
-          console.error('Invalid data format:', data);
-        }
+        const response = await axios.get(
+          `/post/get_patch_status_host_details.php?project_id=${this.projectId}&hostname=${hostname}`,
+        );
+        this.hostDetails = response.data;
       } catch (error) {
-        console.error('Error fetching chart data:', error);
-      }
-    },
-    async fetchLineSeries() {
-      try {
-        const response = await axios.get('/post/graph-line.php');
-        this.lineseries = response.data || [];
-      } catch (error) {
-        console.error('Error fetching lineseries data:', error);
-      }
-    },
-    async fetchDonutSeries() {
-      try {
-        const response = await axios.get('/post/graph-donut.php');
-        this.donutSeries = response.data || [];
-      } catch (error) {
-        console.error('Error fetching donutSeries data:', error);
+        console.error('Error fetching host details:', error);
       }
     },
   },
@@ -229,9 +141,38 @@ export default {
 </script>
 
 <style scoped>
-.chart-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: left;
+.container {
+  width: 100%;
+  padding: 12px;
+  margin-right: auto;
+  margin-left: 18px;
+}
+
+.host-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.host-list li {
+  margin-bottom: 10px;
+}
+
+.host-list a {
+  text-decoration: none;
+  color: #42b983;
+}
+
+.host-list a:hover {
+  text-decoration: underline;
+  color: #2c3e50;
+}
+
+.col-4,
+.col-8 {
+  text-align: left;
+}
+
+.row {
+  width: 100%;
 }
 </style>

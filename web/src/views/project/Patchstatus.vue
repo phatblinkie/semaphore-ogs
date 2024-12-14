@@ -1,6 +1,17 @@
 <template>
-  <div id="app">
-    <Patchstatus msg="Welcome to Your Vue.js App" />
+  <div>
+    <v-toolbar flat>
+      <v-toolbar-title>Patch Status</v-toolbar-title>
+    </v-toolbar>
+    <v-container>
+      <!-- Blank page content -->
+      <v-row>
+        <v-col>
+          <h1>Patch Status</h1>
+          <p>This page is currently under construction.</p>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
