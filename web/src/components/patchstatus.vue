@@ -13,7 +13,7 @@
     </v-tabs>
     <v-container>
       <v-row>
-        <v-col cols="4">
+        <v-col cols="2">
           <h2>Hosts</h2>
           <v-list dense>
             <v-list-item
@@ -22,30 +22,37 @@
               @click="fetchHostDetails(host.hostname)"
             >
               <v-list-item-content>
-                <v-list-item-title>{{ host.hostname }}</v-list-item-title>
+                <v-btn small outlined>{{ host.hostname }}</v-btn>
               </v-list-item-content>
             </v-list-item>
           </v-list>
         </v-col>
-        <v-col cols="8">
+        <v-col cols="3">
+          <h2>Available Updates</h2>
+          <v-list dense>
+            <v-list-item
+              v-for="host in hosts"
+              :key="host.hostname"
+            >
+              <v-list-item-content>
+                <v-list-item-title>{{ host.available_updates }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-col>
+        <v-col cols="7">
           <h2>Host Details</h2>
           <div v-if="hostDetails">
             <v-simple-table dense>
               <template v-slot:default>
-                <thead>
-                  <tr>
-                    <th class="text-left">Field</th>
-                    <th class="text-left">Value</th>
-                  </tr>
-                </thead>
                 <tbody>
                   <tr>
                     <td><strong>Hostname</strong></td>
                     <td>{{ hostDetails.hostname }}</td>
                   </tr>
                   <tr>
-                    <td><strong>Changed</strong></td>
-                    <td>{{ hostDetails.changed }}</td>
+                    <td><strong>Timestamp</strong></td>
+                    <td>{{ formatTimestamp(hostDetails.timestamp) }}</td>
                   </tr>
                   <tr>
                     <td><strong>Failed</strong></td>
@@ -60,27 +67,27 @@
                     <td>{{ hostDetails.rc }}</td>
                   </tr>
                   <tr>
-                    <td><strong>Project ID</strong></td>
-                    <td>{{ hostDetails.project_id }}</td>
-                  </tr>
-                  <tr>
                     <td><strong>Task ID</strong></td>
-                    <td>{{ hostDetails.task_id }}</td>
+                    <td>
+                      <a :href="`/project/${projectId}/templates?t=${hostDetails.task_id}`">
+                        {{ hostDetails.task_id }}
+                      </a>
+                    </td>
                   </tr>
                 </tbody>
               </template>
             </v-simple-table>
-            <h3>Results</h3>
+            <h3>Updates</h3>
             <v-simple-table dense>
               <template v-slot:default>
                 <thead>
                   <tr>
-                    <th class="text-left">Result</th>
+                    <th class="text-left">Update</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="result in hostDetails.results" :key="result">
-                    <td>{{ result }}</td>
+                  <tr v-for="update in hostDetails.updates" :key="update">
+                    <td>{{ update }}</td>
                   </tr>
                 </tbody>
               </template>
@@ -136,6 +143,10 @@ export default {
         console.error('Error fetching host details:', error);
       }
     },
+    formatTimestamp(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleString();
+    },
   },
 };
 </script>
@@ -167,8 +178,8 @@ export default {
   color: #2c3e50;
 }
 
-.col-4,
-.col-8 {
+.col-3,
+.col-6 {
   text-align: left;
 }
 
