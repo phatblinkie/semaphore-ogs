@@ -21,7 +21,7 @@ import IntegrationExtractor from '../views/project/IntegrationExtractor.vue';
 import Apps from '../views/Apps.vue';
 import Graphs from '../components/graphs.vue';
 import Patchstatus from '../components/patchstatus.vue';
-import Compliance from '../components/compliance.vue';
+import Compliancestatus from '../views/project/compliancestatus.vue'; // Import the new component
 
 Vue.use(VueRouter);
 
@@ -56,7 +56,7 @@ const routes = [
   },
   {
     path: '/project/:projectId/compliancestatus',
-    component: Compliance,
+    component: Compliancestatus,
   },
   {
     path: '/project/:projectId/activity',

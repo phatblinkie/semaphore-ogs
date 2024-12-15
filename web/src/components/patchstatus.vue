@@ -5,7 +5,7 @@
     </v-toolbar>
     <v-tabs show-arrows class="pl-4">
       <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">System Status</v-tab>
-      <v-tab key="Graphs" :to="`/project/${projectId}/graphs`">Graphs</v-tab>
+      <v-tab key="TaskGraphs" :to="`/project/${projectId}/graphs`">Task Graphs</v-tab>
       <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
       <v-tab key="Compliancestatus" :to="`/project/${projectId}/compliancestatus`">
         Compliance Status
@@ -13,34 +13,23 @@
     </v-tabs>
     <v-container>
       <v-row>
-        <v-col cols="2">
-          <h2>Hosts</h2>
-          <v-list dense>
-            <v-list-item
-              v-for="host in hosts"
-              :key="host.hostname"
-              @click="fetchHostDetails(host.hostname)"
-            >
-              <v-list-item-content>
-                <v-btn small outlined>{{ host.hostname }}</v-btn>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-col>
         <v-col cols="3">
-          <h2>Available Updates</h2>
-          <v-list dense>
-            <v-list-item
-              v-for="host in hosts"
-              :key="host.hostname"
-            >
-              <v-list-item-content>
-                <v-list-item-title>{{ host.available_updates }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
+          <h2>Hosts and Available Updates</h2>
+          <v-data-table
+            :headers="headers"
+            :items="hosts"
+            item-key="hostname"
+            dense
+            hide-default-footer
+          >
+            <template v-slot:item.hostname="{ item }">
+              <v-btn small outlined @click="fetchHostDetails(item.hostname)">
+                {{ item.hostname }}
+              </v-btn>
+            </template>
+          </v-data-table>
         </v-col>
-        <v-col cols="7">
+        <v-col cols="9">
           <h2>Host Details</h2>
           <div v-if="hostDetails">
             <v-simple-table dense>
@@ -55,19 +44,11 @@
                     <td>{{ formatTimestamp(hostDetails.timestamp) }}</td>
                   </tr>
                   <tr>
-                    <td><strong>Failed</strong></td>
+                    <td><strong>Failed Updates</strong></td>
                     <td>{{ hostDetails.failed }}</td>
                   </tr>
                   <tr>
-                    <td><strong>Message</strong></td>
-                    <td>{{ hostDetails.msg }}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Return Code</strong></td>
-                    <td>{{ hostDetails.rc }}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Task ID</strong></td>
+                    <td><strong>Last Task Run</strong></td>
                     <td>
                       <a :href="`/project/${projectId}/templates?t=${hostDetails.task_id}`">
                         {{ hostDetails.task_id }}
@@ -77,16 +58,18 @@
                 </tbody>
               </template>
             </v-simple-table>
-            <h3>Updates</h3>
             <v-simple-table dense>
               <template v-slot:default>
                 <thead>
                   <tr>
-                    <th class="text-left">Update</th>
+                    <th class="text-left">Available Updates</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="update in hostDetails.updates" :key="update">
+                  <tr v-if="hostDetails.updates.length === 0">
+                    <td>No updates available</td>
+                  </tr>
+                  <tr v-else v-for="update in hostDetails.updates" :key="update">
                     <td>{{ update }}</td>
                   </tr>
                 </tbody>
@@ -117,6 +100,10 @@ export default {
     return {
       hosts: [],
       hostDetails: null,
+      headers: [
+        { text: 'Host', value: 'hostname' },
+        { text: 'Available Updates', value: 'available_updates' },
+      ],
     };
   },
   created() {
@@ -179,7 +166,7 @@ export default {
 }
 
 .col-3,
-.col-6 {
+.col-9 {
   text-align: left;
 }
 
