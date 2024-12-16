@@ -5,7 +5,7 @@
     </v-toolbar>
     <v-tabs show-arrows class="pl-4">
       <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">System Status</v-tab>
-      <v-tab key="Graphs" :to="`/project/${projectId}/graphs`">Graphs</v-tab>
+      <v-tab key="Graphs" :to="`/project/${projectId}/graphs`">Task Graphs</v-tab>
       <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
       <v-tab key="Compliancestatus" :to="`/project/${projectId}/compliancestatus`"
       >Compliance Status</v-tab>
