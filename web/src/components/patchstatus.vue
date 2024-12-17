@@ -5,7 +5,7 @@
     </v-toolbar>
     <v-tabs show-arrows class="pl-4">
       <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">System Status</v-tab>
-      <v-tab key="TaskGraphs" :to="`/project/${projectId}/graphs`">Task Graphs</v-tab>
+      <v-tab key="TaskGraphs" :to="`/project/${projectId}/taskgraphs`">Task Graphs</v-tab>
       <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
       <v-tab key="Compliancestatus" :to="`/project/${projectId}/compliancestatus`">
         Compliance Status
@@ -116,6 +116,7 @@ export default {
           `/post/get_patch_status_hosts.php?project_id=${this.projectId}`,
         );
         this.hosts = response.data;
+        console.log('Hosts:', this.hosts); // Log the hosts data
       } catch (error) {
         console.error('Error fetching hosts:', error);
       }
@@ -126,6 +127,7 @@ export default {
           `/post/get_patch_status_host_details.php?project_id=${this.projectId}&hostname=${hostname}`,
         );
         this.hostDetails = response.data;
+        console.log('Host Details:', this.hostDetails); // Log the host details data
       } catch (error) {
         console.error('Error fetching host details:', error);
       }
