@@ -18,6 +18,7 @@ module.exports = {
     'vuejs-accessibility/click-events-have-key-events': 'off',
     'vue/valid-v-slot': 'off',
     'vue/multi-word-component-names': 'off',
+    'max-len': ['error', { code: 210 }], // Adjust the number to your desired maximum line length
   },
   overrides: [
     {
