@@ -35,57 +35,47 @@
       <v-row>
         <v-col cols="3">
           <h2>Hosts and Available Updates</h2>
-          <v-data-table
-            :headers="headers"
-            :items="hosts"
-            item-key="hostname"
-            dense
-            hide-default-footer
-            class="fixed-table"
-          >
-            <template v-slot:item.hostname="{ item }">
-              <v-btn
-                small
-                outlined
-                @click="onHostSelected(item.hostname)"
-              >
-                {{ item.hostname }}
-              </v-btn>
-            </template>
-          </v-data-table>
+          <div class="host-list">
+            <ul>
+              <li v-for="host in hosts" :key="host.hostname" class="host-item">
+                <v-btn
+                  small
+                  outlined
+                  @click="onHostSelected(host.hostname)"
+                >
+                  {{ host.hostname }}
+                </v-btn>
+                <v-chip
+                  :color="host.available_updates === 0 ? 'green' : 'teal'"
+                  label
+                  pill
+                  class="ma-2"
+                >
+                  {{ host.available_updates }}
+                </v-chip>
+                <v-badge
+                  :content="host.formatted_timestamp"
+                  color="secondary"
+                >
+                </v-badge>
+              </li>
+            </ul>
+          </div>
         </v-col>
 
         <v-col cols="9">
           <h2>Host Details</h2>
           <div v-if="hostDetails">
-            <v-simple-table dense class="fixed-table">
-              <template v-slot:default>
-                <tbody>
-                  <tr>
-                    <td><strong>Hostname</strong></td>
-                    <td>{{ hostDetails.hostname }}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Timestamp</strong></td>
-                    <td>{{ formatTimestamp(hostDetails.timestamp) }}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Failed Updates</strong></td>
-                    <td>{{ hostDetails.failed }}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Last Task Run</strong></td>
-                    <td>
-                      <a
-                        :href="`/project/${projectId}/templates?t=${hostDetails.task_id}`"
-                      >
-                        {{ hostDetails.task_id }}
-                      </a>
-                    </td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
+            <div class="host-details">
+              <div><strong>Hostname:</strong> {{ hostDetails.hostname }}</div>
+              <div><strong>Timestamp:</strong> {{ hostDetails.formatted_timestamp }} ({{ hostDetails.timestamp }})</div>
+              <div><strong>Failed Updates:</strong> {{ hostDetails.failed }}</div>
+              <div><strong>Last Task Run:</strong>
+                <a :href="`/project/${projectId}/templates?t=${hostDetails.task_id}`">
+                  {{ hostDetails.task_id }}
+                </a>
+              </div>
+            </div>
 
             <div style="display: flex; gap: 20px; margin-top: 20px;">
               <v-btn
@@ -105,69 +95,43 @@
             </div>
 
             <div v-if="showAvailableUpdates" style="margin-top: 20px;">
-              <v-simple-table dense class="fixed-table">
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left">Available Updates</th>
-                      <th>
-                        <v-text-field
-                          v-model="availableUpdatesSearch"
-                          label="Search"
-                          dense
-                          hide-details
-                          @keyup="searchAvailableUpdates"
-                        ></v-text-field>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="filteredAvailableUpdates.length === 0">
-                      <td colspan="2">No updates available</td>
-                    </tr>
-                    <tr
-                      v-else
-                      v-for="(updateItem, index) in filteredAvailableUpdates"
-                      :key="index"
-                    >
-                      <td colspan="2">{{ updateItem }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
+              <div class="update-list">
+                <div class="search-bar">
+                  <v-text-field
+                    v-model="availableUpdatesSearch"
+                    label="Search"
+                    dense
+                    hide-details
+                    @input="searchAvailableUpdates"
+                  ></v-text-field>
+                </div>
+                <ul>
+                  <li v-if="filteredAvailableUpdates.length === 0">No updates available</li>
+                  <li v-else v-for="(updateItem, index) in filteredAvailableUpdates" :key="index">
+                    {{ updateItem }}
+                  </li>
+                </ul>
+              </div>
             </div>
 
             <div v-if="showInstalledUpdates" style="margin-top: 20px;">
-              <v-simple-table dense class="fixed-table">
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left">Installed Updates</th>
-                      <th>
-                        <v-text-field
-                          v-model="installedUpdatesSearch"
-                          label="Search"
-                          dense
-                          hide-details
-                          @keyup="searchInstalledUpdates"
-                        ></v-text-field>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="filteredInstalledUpdates.length === 0">
-                      <td colspan="2">No installed updates</td>
-                    </tr>
-                    <tr
-                      v-else
-                      v-for="(installed, index) in filteredInstalledUpdates"
-                      :key="index"
-                    >
-                      <td colspan="2">{{ installed }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
+              <div class="update-list">
+                <div class="search-bar">
+                  <v-text-field
+                    v-model="installedUpdatesSearch"
+                    label="Search"
+                    dense
+                    hide-details
+                    @input="searchInstalledUpdates"
+                  ></v-text-field>
+                </div>
+                <ul>
+                  <li v-if="filteredInstalledUpdates.length === 0">No installed updates</li>
+                  <li v-else v-for="(installed, index) in filteredInstalledUpdates" :key="index">
+                    {{ installed }}
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
           <div v-else>
@@ -225,6 +189,7 @@ export default {
     },
 
     async onHostSelected(hostname) {
+      this.clearSearchFields();
       await this.fetchHostDetails(hostname);
     },
 
@@ -238,49 +203,25 @@ export default {
         this.showInstalledUpdates = false;
         this.filteredAvailableUpdates = this.hostDetails.updates || [];
         this.filteredInstalledUpdates = this.hostDetails.installedUpdates || [];
-        // console.log('Host details:', this.hostDetails);
-        // console.log('Filtered installed updates:', this.filteredInstalledUpdates);
       } catch (error) {
         console.error('Error fetching host details:', error);
       }
     },
 
-    async searchAvailableUpdates() {
+    searchAvailableUpdates() {
       if (!this.availableUpdatesSearch) {
         this.filteredAvailableUpdates = this.hostDetails.updates || [];
         return;
       }
-      try {
-        const resp = await axios.get(
-          `/post/search_available_updates.php?project_id=${this.projectId}&hostname=${this.hostDetails.hostname}&search=${this.availableUpdatesSearch}`,
-        );
-        this.filteredAvailableUpdates = resp.data;
-      } catch (error) {
-        console.error('Error searching available updates:', error);
-      }
+      this.filteredAvailableUpdates = this.hostDetails.updates.filter((update) => update.toLowerCase().includes(this.availableUpdatesSearch.toLowerCase()));
     },
 
-    async searchInstalledUpdates() {
+    searchInstalledUpdates() {
       if (!this.installedUpdatesSearch) {
-        // Ensure it's always an array
-        this.filteredInstalledUpdates = Array.isArray(this.hostDetails.installedUpdates)
-          ? this.hostDetails.installedUpdates
-          : [];
+        this.filteredInstalledUpdates = this.hostDetails.installedUpdates || [];
         return;
       }
-      try {
-        const resp = await axios.get(
-          `/post/search_installed_updates.php?project_id=${this.projectId}&hostname=${this.hostDetails.hostname}&search=${this.installedUpdatesSearch}`,
-        );
-        // console.log('Installed updates response:', resp.data);
-        // Always store an array
-        this.filteredInstalledUpdates = Array.isArray(resp.data)
-          ? resp.data
-          : [];
-        // console.log('Filtered installed updates:', this.filteredInstalledUpdates);
-      } catch (error) {
-        // console.error('Error searching installed updates:', error);
-      }
+      this.filteredInstalledUpdates = this.hostDetails.installedUpdates.filter((installed) => installed.toLowerCase().includes(this.installedUpdatesSearch.toLowerCase()));
     },
 
     toggleTable(table) {
@@ -297,9 +238,9 @@ export default {
       }
     },
 
-    formatTimestamp(ts) {
-      const dateObj = new Date(ts);
-      return dateObj.toLocaleString();
+    clearSearchFields() {
+      this.availableUpdatesSearch = '';
+      this.installedUpdatesSearch = '';
     },
   },
   watch: {
@@ -316,11 +257,12 @@ export default {
     installedUpdatesSearch(newVal) {
       // If search is cleared, ensure we still have an array
       if (!newVal) {
-        this.filteredInstalledUpdates = Array.isArray(this.hostDetails.installedUpdates)
-          ? this.hostDetails.installedUpdates
-          : [];
+        this.filteredInstalledUpdates = this.hostDetails.installedUpdates || [];
       }
     },
+  },
+  beforeDestroy() {
+    this.clearSearchFields();
   },
 };
 </script>
@@ -358,5 +300,26 @@ body {
 }
 .align-left {
   margin-left: 0;
+}
+.host-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+.host-list li {
+  margin-bottom: 2px; /* Reduced margin */
+  text-align: left;
+}
+.host-details div {
+  margin-bottom: 10px;
+}
+.update-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+.update-list li {
+  margin-bottom: 10px;
+}
+.search-bar {
+  margin-bottom: 10px;
 }
 </style>
