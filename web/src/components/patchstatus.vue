@@ -41,6 +41,7 @@
                 <v-btn
                   small
                   outlined
+                  :class="{ 'active-btn': selectedHost === host.hostname }"
                   @click="onHostSelected(host.hostname)"
                 >
                   {{ host.hostname }}
@@ -64,23 +65,12 @@
         </v-col>
 
         <v-col cols="9">
-          <h2>Host Details</h2>
           <div v-if="hostDetails">
-            <div class="host-details">
-              <div><strong>Hostname:</strong> {{ hostDetails.hostname }}</div>
-              <div><strong>Timestamp:</strong> {{ hostDetails.formatted_timestamp }} ({{ hostDetails.timestamp }})</div>
-              <div><strong>Failed Updates:</strong> {{ hostDetails.failed }}</div>
-              <div><strong>Last Task Run:</strong>
-                <a :href="`/project/${projectId}/templates?t=${hostDetails.task_id}`">
-                  {{ hostDetails.task_id }}
-                </a>
-              </div>
-            </div>
-
             <div style="display: flex; gap: 20px; margin-top: 20px;">
               <v-btn
                 small
                 outlined
+                :class="{ 'active-btn': activeTable === 'available' }"
                 @click="toggleTable('available')"
               >
                 Available Updates
@@ -88,6 +78,7 @@
               <v-btn
                 small
                 outlined
+                :class="{ 'active-btn': activeTable === 'installed' }"
                 @click="toggleTable('installed')"
               >
                 Installed Updates
@@ -105,7 +96,7 @@
                     @input="searchAvailableUpdates"
                   ></v-text-field>
                 </div>
-                <ul>
+                <ul class="update-items">
                   <li v-if="filteredAvailableUpdates.length === 0">No updates available</li>
                   <li v-else v-for="(updateItem, index) in filteredAvailableUpdates" :key="index">
                     {{ updateItem }}
@@ -125,7 +116,7 @@
                     @input="searchInstalledUpdates"
                   ></v-text-field>
                 </div>
-                <ul>
+                <ul class="update-items">
                   <li v-if="filteredInstalledUpdates.length === 0">No installed updates</li>
                   <li v-else v-for="(installed, index) in filteredInstalledUpdates" :key="index">
                     {{ installed }}
@@ -164,6 +155,8 @@ export default {
       installedUpdatesSearch: '',
       filteredAvailableUpdates: [],
       filteredInstalledUpdates: [],
+      selectedHost: null,
+      activeTable: 'available',
       headers: [
         { text: 'Host', value: 'hostname' },
         {
@@ -189,6 +182,10 @@ export default {
     },
 
     async onHostSelected(hostname) {
+      this.selectedHost = hostname;
+      this.activeTable = 'available';
+      this.showAvailableUpdates = true;
+      this.showInstalledUpdates = false;
       this.clearSearchFields();
       await this.fetchHostDetails(hostname);
     },
@@ -199,8 +196,6 @@ export default {
           `/post/get_combined_patch_status.php?project_id=${this.projectId}&hostname=${hostname}`,
         );
         this.hostDetails = resp.data;
-        this.showAvailableUpdates = false;
-        this.showInstalledUpdates = false;
         this.filteredAvailableUpdates = this.hostDetails.updates || [];
         this.filteredInstalledUpdates = this.hostDetails.installedUpdates || [];
       } catch (error) {
@@ -225,6 +220,7 @@ export default {
     },
 
     toggleTable(table) {
+      this.activeTable = table;
       if (table === 'available') {
         this.showAvailableUpdates = !this.showAvailableUpdates;
         this.showInstalledUpdates = false;
@@ -319,7 +315,14 @@ body {
 .update-list li {
   margin-bottom: 10px;
 }
+.update-items {
+  text-align: left;
+}
 .search-bar {
   margin-bottom: 10px;
+}
+.active-btn {
+  background-color: #1976d2 !important;
+  color: white !important;
 }
 </style>
