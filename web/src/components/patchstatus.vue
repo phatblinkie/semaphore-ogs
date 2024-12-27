@@ -98,7 +98,7 @@
                 </div>
                 <ul class="update-items">
                   <li v-if="filteredAvailableUpdates.length === 0">No updates available</li>
-                  <li v-else v-for="(updateItem, index) in filteredAvailableUpdates" :key="index">
+                  <li v-else v-for="(updateItem, index) in filteredAvailableUpdates" :key="index" class="update-item">
                     {{ updateItem }}
                   </li>
                 </ul>
@@ -118,7 +118,7 @@
                 </div>
                 <ul class="update-items">
                   <li v-if="filteredInstalledUpdates.length === 0">No installed updates</li>
-                  <li v-else v-for="(installed, index) in filteredInstalledUpdates" :key="index">
+                  <li v-else v-for="(installed, index) in filteredInstalledUpdates" :key="index" class="update-item">
                     {{ installed }}
                   </li>
                 </ul>
@@ -317,6 +317,12 @@ body {
 }
 .update-items {
   text-align: left;
+}
+.update-items .update-item:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+.update-items .update-item:nth-child(even) {
+  background-color: #e9e9e9;
 }
 .search-bar {
   margin-bottom: 10px;
