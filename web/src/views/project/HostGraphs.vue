@@ -12,7 +12,7 @@
       </v-tab>
     </v-tabs>
     <br>
-    <table>
+    <table width="100%">
       <v-row>
         <v-btn @click="setTimeFrame('today')">Today</v-btn>
         <v-btn @click="setTimeFrame('week')">7 Days</v-btn>
@@ -20,20 +20,20 @@
         <v-btn @click="setTimeFrame('90days')">90 Days</v-btn>
       </v-row>
       <v-row class="left-aligned">
-        <v-col cols="6">
+        <v-col cols="12">
           <apexchart
             type="line"
-            width="600"
             height="350"
             :options="diskChartOptions"
             :series="diskSeries"
             :key="diskChartKey"
           ></apexchart>
         </v-col>
-        <v-col cols="6">
+      </v-row>
+      <v-row class="left-aligned">
+        <v-col cols="12">
           <apexchart
             type="line"
-            width="600"
             height="350"
             :options="procChartOptions"
             :series="procSeries"
@@ -42,10 +42,9 @@
         </v-col>
       </v-row>
       <v-row class="left-aligned">
-        <v-col cols="6">
+        <v-col cols="12">
           <apexchart
             type="line"
-            width="600"
             height="350"
             :options="uptimeChartOptions"
             :series="uptimeSeries"
@@ -70,12 +69,7 @@ export default {
       projectId: this.$route.params.projectId,
       hostname: this.$route.params.hostname,
       timeFrame: 'today', // Default time frame
-      diskSeries: [
-        {
-          name: 'Disk Capacity',
-          data: [],
-        },
-      ],
+      diskSeries: [],
       procSeries: [
         {
           name: 'Proc Usage',
@@ -100,7 +94,7 @@ export default {
           curve: 'smooth',
         },
         title: {
-          text: 'Disk Capacity',
+          text: 'Disk Capacity % Used',
           align: 'left',
         },
       },
@@ -164,11 +158,38 @@ export default {
         .get(`/post/get_host_history.php?project_id=${this.projectId}&hostname=${this.hostname}&time_frame=${this.timeFrame}`)
         .then((response) => {
           const data = response.data;
+          console.log('Fetched data:', data); // Debugging line to check the fetched data
+
+          if (!Array.isArray(data)) {
+            throw new Error('Expected data to be an array');
+          }
+
           const categories = data.map((entry) => entry.last_updated);
-          this.diskChartOptions.xaxis.categories = categories;
+
+          // Initialize disk series
+          const diskSeriesMap = {};
+
+          data.forEach((entry) => {
+            if (Array.isArray(entry.disk_capacity)) {
+              entry.disk_capacity.forEach((disk) => {
+                if (!diskSeriesMap[disk.name]) {
+                  diskSeriesMap[disk.name] = {
+                    name: disk.name,
+                    data: [],
+                  };
+                }
+                diskSeriesMap[disk.name].data.push({
+                  x: entry.last_updated,
+                  y: disk.used,
+                });
+              });
+            }
+          });
+
+          this.diskSeries = Object.values(diskSeriesMap);
+
           this.procChartOptions.xaxis.categories = categories;
           this.uptimeChartOptions.xaxis.categories = categories;
-          this.diskSeries[0].data = data.map((entry) => parseFloat(entry.disk_capacity));
           this.procSeries[0].data = data.map((entry) => parseFloat(entry.proc_usage));
           this.uptimeSeries[0].data = data.map((entry) => parseFloat(entry.uptime));
           this.diskChartKey += 1; // Update the key to force re-render

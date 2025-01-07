@@ -1,4 +1,4 @@
-<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+<template>
   <div>
     <v-toolbar flat>
       <v-toolbar-title> System Status </v-toolbar-title>
@@ -22,6 +22,15 @@
       :options.sync="tableOptions"
       class="mt-4"
       dense
+      :footer-props="{
+        'items-per-page-options': [20, 50, 100],
+        'items-per-page-text': 'Rows per page:',
+        'show-first-last-page': true,
+        'show-current-page': true,
+        'show-items-per-page': true,
+        'show-select': true,
+        'align': 'left'
+      }"
     >
       <template v-slot:item.hostname="{ item }">
         <router-link :to="`/project/${projectId}/host/${item.hostname}`">{{
