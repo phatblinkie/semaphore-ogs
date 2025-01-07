@@ -41,7 +41,7 @@
         <TaskStatus :status="item.ansible_ping" />
       </template>
       <template v-slot:item.disk_capacity="{ item }">
-        <div class="disk-meter">
+        <div v-if="item.ansible_ping !== 'unreachable'" class="disk-meter">
           <div v-for="(disk, index) in parseDiskCapacity(item.disk_capacity)" :key="index" class="disk-item">
             <span class="disk-label">{{ disk.name }}: {{ disk.used }}%</span>
             <meter
@@ -55,10 +55,13 @@
             ></meter>
           </div>
         </div>
+        <div v-else>
+          N/A
+        </div>
       </template>
 
       <template v-slot:item.proc_usage="{ item }">
-        <div class="proc-meter">
+        <div v-if="item.ansible_ping !== 'unreachable'" class="proc-meter">
           <span class="proc-label">{{ roundProcUsage(item.proc_usage) }}%</span>
           <meter
             :value="roundProcUsage(item.proc_usage)"
@@ -70,6 +73,9 @@
             class="meter"
           ></meter>
         </div>
+        <div v-else>
+          N/A
+        </div>
       </template>
       <template v-slot:item.app_check="{ item }">
         <AppCheckStatus :status="item.app_check" />
@@ -78,7 +84,8 @@
         <span>{{ formatTimestamp(item.last_responded) }}</span>
       </template>
       <template v-slot:item.uptime="{ item }">
-        <span>{{ formatUptime(item.uptime) }}</span>
+        <span v-if="item.ansible_ping !== 'unreachable'">{{ formatUptime(item.uptime) }}</span>
+        <span v-else>N/A</span>
       </template>
     </v-data-table>
   </div>
