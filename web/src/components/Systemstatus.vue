@@ -8,9 +8,7 @@
         System Status
       </v-tab>
       <v-tab key="Graphs" :to="`/project/${projectId}/graphs`">Task Graphs</v-tab>
-      <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`"
-        >Patch Status</v-tab
-      >
+      <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
       <v-tab key="Compliancestatus" :to="`/project/${projectId}/compliancestatus`">
         Compliance Status
       </v-tab>
@@ -41,23 +39,36 @@
         <TaskStatus :status="item.ansible_ping" />
       </template>
       <template v-slot:item.disk_capacity="{ item }">
-        <div v-if="item.ansible_ping !== 'unreachable'" class="disk-meter">
-          <div v-for="(disk, index) in parseDiskCapacity(item.disk_capacity)" :key="index" class="disk-item">
-            <span class="disk-label">{{ disk.name }}: {{ disk.used }}%</span>
-            <meter
-              :value="disk.used"
-              :min="0"
-              :max="100"
-              :low="70"
-              :high="90"
-              :optimum="0"
-              class="meter"
-            ></meter>
+        <div class="disk-warning" v-if="isDiskOver90(item.disk_capacity)">
+          <v-icon color="red">mdi-alert</v-icon>
+        </div>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn v-bind="attrs" v-on="on" icon>
+              <v-icon>mdi-information</v-icon>
+            </v-btn>
+          </template>
+          <div v-if="item.ansible_ping !== 'unreachable'" class="disk-meter tooltip-content">
+            <div v-for="(disk, index) in parseDiskCapacity(item.disk_capacity)" :key="index" class="disk-item">
+              <div class="disk-info">
+                <span class="disk-label">{{ disk.name }}</span>
+                <span class="disk-percent">{{ disk.used }}%</span>
+              </div>
+              <meter
+                :value="disk.used"
+                :min="0"
+                :max="100"
+                :low="70"
+                :high="90"
+                :optimum="0"
+                class="meter"
+              ></meter>
+            </div>
           </div>
-        </div>
-        <div v-else>
-          N/A
-        </div>
+          <div v-else>
+            N/A
+          </div>
+        </v-tooltip>
       </template>
 
       <template v-slot:item.proc_usage="{ item }">
@@ -161,6 +172,9 @@ export default {
         return { name, used: parseInt(used, 10) };
       });
     },
+    isDiskOver90(diskCapacity) {
+      return this.parseDiskCapacity(diskCapacity).some((disk) => disk.used > 90);
+    },
   },
 };
 </script>
@@ -193,9 +207,14 @@ export default {
 }
 .disk-item {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 4px;
+  width: 100%;
+}
+.disk-info {
+  display: flex;
+  justify-content: space-between;
   width: 100%;
 }
 .disk-label,
@@ -203,10 +222,21 @@ export default {
   font-weight: bold;
   margin-right: 8px;
 }
+.disk-percent {
+  margin-left: auto;
+}
 .disk-meter meter,
 .proc-meter meter {
   flex-grow: 1;
   height: 20px;
   width: 100%;
+}
+.tooltip-content {
+  width: 500px;
+  height: auto;
+}
+.disk-warning {
+  display: inline-block;
+  margin-right: 8px;
 }
 </style>
