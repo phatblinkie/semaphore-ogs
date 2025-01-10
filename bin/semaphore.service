@@ -9,7 +9,7 @@ User=semaphore
 Group=semaphore
 Type=simple
 ExecReload=/bin/kill -HUP $MAINPID
-ExecStart=/usr/local/bin/semaphore service --config=/etc/semaphore/config.json
+ExecStart=/usr/bin/semaphore service --config=/etc/semaphore.json
 SyslogIdentifier=semaphore
 Restart=always
 
