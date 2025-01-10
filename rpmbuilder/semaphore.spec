@@ -40,7 +40,7 @@ mkdir -p %{buildroot}%{_unitdir}
 install -m 755 usr/bin/semaphore %{buildroot}%{_bindir}/semaphore
 install -m 755 usr/bin/semaphore-setup %{buildroot}%{_bindir}/semaphore-setup
 install -m 644 usr/lib/systemd/system/semaphore.service %{buildroot}%{_unitdir}/semaphore.service
-install -m 644 usr/lib/systemd/system/semaphore.json %{buildroot}%{configdir}/semaphore.json
+install -m 644 etc/semaphore.json %{buildroot}%{configdir}/semaphore.json
 
 %files
 %attr(755, root, root) %{_bindir}/semaphore
