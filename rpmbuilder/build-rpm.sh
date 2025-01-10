@@ -3,7 +3,7 @@
 # Define variables
 PACKAGE_NAME="semaphore-ogs"
 VERSION="1.0.0"
-RELEASE="1"
+RELEASE="2"
 TARBALL="${PACKAGE_NAME}-${VERSION}.tar.gz"
 SPEC_FILE="semaphore.spec"
 
@@ -44,3 +44,4 @@ rpmbuild -ba ~/rpmbuild/SPECS/$SPEC_FILE
 
 # Output the location of the built RPM
 echo "RPM built successfully. You can find it in ~/rpmbuild/RPMS/x86_64/"
+ls ~/rpmbuild/RPMS/x86_64/

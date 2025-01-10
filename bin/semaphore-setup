@@ -1,1 +1,2 @@
+#!/usr/bin/bash
 semaphore setup --config=/etc/semaphore/config.json
