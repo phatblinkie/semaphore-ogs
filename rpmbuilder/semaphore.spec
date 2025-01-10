@@ -40,12 +40,15 @@ mkdir -p %{buildroot}%{_unitdir}
 install -m 755 usr/bin/semaphore %{buildroot}%{_bindir}/semaphore
 install -m 755 usr/bin/semaphore-setup %{buildroot}%{_bindir}/semaphore-setup
 install -m 644 usr/lib/systemd/system/semaphore.service %{buildroot}%{_unitdir}/semaphore.service
+install -m 644 usr/lib/systemd/system/semaphore.service %{buildroot}%{configdir}/semaphore.json
 
 %files
 %attr(755, root, root) %{_bindir}/semaphore
 %attr(755, root, root) %{_bindir}/semaphore-setup
-%attr(644, root,root) %{_sysconfdir}/semaphore/
+%attr(644, root,root) %{_sysconfdir}/semaphore.json
 %attr(644, root,root) %{_unitdir}/semaphore.service
+
+
 
 %changelog
 * Thu Oct 12 2023 Brian Bowen <bbowen@scholz-associates.com> - 1.0.0-1
