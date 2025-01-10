@@ -18,7 +18,7 @@ mkdir -p ~/repos/semaphore-ogs/rpmbuilder/tmp/${PACKAGE_NAME}-${VERSION}/usr/lib
 # Copy the necessary files to the temporary directory
 cp ~/repos/semaphore-ogs/bin/semaphore ~/repos/semaphore-ogs/rpmbuilder/tmp/${PACKAGE_NAME}-${VERSION}/usr/bin/
 cp ~/repos/semaphore-ogs/bin/semaphore-setup ~/repos/semaphore-ogs/rpmbuilder/tmp/${PACKAGE_NAME}-${VERSION}/usr/bin/
-cp ~/repos/semaphore-ogs/semaphore.json ~/repos/semaphore-ogs/rpmbuilder/tmp/${PACKAGE_NAME}-${VERSION}/etc/
+cp ~/repos/semaphore-ogs/config.json ~/repos/semaphore-ogs/rpmbuilder/tmp/${PACKAGE_NAME}-${VERSION}/etc/
 cp ~/repos/semaphore-ogs/bin/semaphore.service ~/repos/semaphore-ogs/rpmbuilder/tmp/${PACKAGE_NAME}-${VERSION}/usr/lib/systemd/system/
 
 # Add build-id to the binary using objcopy
