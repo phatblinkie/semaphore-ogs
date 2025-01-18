@@ -4,7 +4,7 @@
 
 Name:           semaphore-ogs
 Version:        1.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Customized Semaphore and configuration
 
 License:        MIT
@@ -48,5 +48,10 @@ install -m 644 etc/semaphore.json %{buildroot}%{_sysconfdir}/semaphore.json
 %attr(644, root,root) %{_sysconfdir}/semaphore.json
 
 %changelog
-* Thu Oct 12 2023 Brian Bowen <bbowen@scholz-associates.com> - 1.0.0-1
+* Thu Jan 5 2025 Brian Bowen <bbowen@scholz-associates.com> - 1.0.0-1
 - Initial package
+* Thu Jan 12 2025 Brian Bowen <bbowen@scholz-associates.com> - 1.0.0-2
+- Better logic for patch status pages
+* Thu Jan 18 2025 Brian Bowen <bbowen@scholz-associates.com> - 1.0.0-3
+- Implemented linux host package displays and searchs
+- several visual fixes

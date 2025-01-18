@@ -12,6 +12,7 @@ ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/bin/semaphore server --config=/etc/semaphore.json
 SyslogIdentifier=semaphore
 Restart=always
+RestartSec=90s
 
 [Install]
 WantedBy=multi-user.target
