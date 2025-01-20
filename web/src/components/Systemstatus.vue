@@ -114,11 +114,11 @@ export default {
       headers: [
         { text: 'Hostname', value: 'hostname', width: '120px' },
         { text: 'Ansible Ping', value: 'ansible_ping', width: '100px' },
-        { text: 'Disk Usage', value: 'disk_capacity', width: 'auto' },
-        { text: 'Proc Usage', value: 'proc_usage', width: 'auto' },
-        { text: 'App Check', value: 'app_check', width: 'auto' },
-        { text: 'Last Responded', value: 'last_responded', width: 'auto' },
-        { text: 'Uptime', value: 'uptime', width: 'auto' },
+        { text: 'Disk Usage', value: 'disk_capacity', width: '150px' }, // Adjusted width
+        { text: 'Proc Usage', value: 'proc_usage', width: '150px' },
+        { text: 'App Check', value: 'app_check', width: '100px' },
+        { text: 'Last Responded', value: 'last_responded', width: '150px' }, // Adjusted width
+        { text: 'Uptime', value: 'uptime', width: '200px' },
       ],
       items: [], // This will be populated with data from the JSON source
       tableOptions: {

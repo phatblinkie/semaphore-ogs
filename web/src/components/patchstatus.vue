@@ -19,129 +19,127 @@
       </v-tab>
     </v-tabs>
 
-    <v-container class="align-left">
-      <v-row>
-        <v-col cols="4">
+    <div class="grid-container">
+      <div class="grid-item hosts">
+        <v-toolbar flat>
+          <v-toolbar-title>Hosts and Available Updates</v-toolbar-title>
+        </v-toolbar>
+        <div class="host-list">
+          <ul>
+            <li v-for="host in hosts" :key="host.hostname" class="host-item">
+              <div class="host-item-content">
+                <v-btn
+                  small
+                  outlined
+                  class="host-btn"
+                  :class="{ 'active-btn': selectedHost === host.hostname }"
+                  @click="onHostSelected(host.hostname, host.os_type)"
+                >
+                  <span class="truncate">{{ host.hostname }}</span>
+                </v-btn>
+                <v-chip
+                  :color="host.available_updates === 0 ? 'green' : 'teal'"
+                  label
+                  pill
+                  class="ma-2"
+                >
+                  {{ host.available_updates }}
+                </v-chip>
+                <v-badge
+                  :content="host.formatted_timestamp"
+                  color="secondary"
+                >
+                </v-badge>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid-item updates">
+        <div v-if="hostDetails">
+          <div class="update-buttons">
+            <v-btn
+              small
+              outlined
+              :class="{ 'active-btn': activeTable === 'available' }"
+              @click="toggleTable('available')"
+            >
+              Available Updates
+            </v-btn>
+            <v-btn
+              small
+              outlined
+              :class="{ 'active-btn': activeTable === 'installed' }"
+              @click="toggleTable('installed')"
+            >
+              Installed Updates
+            </v-btn>
+          </div>
+
+          <div v-if="showAvailableUpdates" style="margin-top: 20px;">
+            <div class="search-bar">
+              <v-text-field
+                v-model="availableUpdatesSearch"
+                label="Perform a search"
+                dense
+                hide-details
+                @input="searchAvailableUpdates"
+              ></v-text-field>
+            </div>
+            <v-simple-table class="updates-table">
+              <thead>
+                <tr>
+                  <th class="text-left">Name</th>
+                  <th v-if="isLinuxHost" class="text-left">Version</th>
+                  <th v-if="isLinuxHost" class="text-left">Repo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(update, index) in filteredAvailableUpdates" :key="index">
+                  <td class="text-left">{{ update.name || update }}</td>
+                  <td v-if="isLinuxHost" class="text-left">{{ update.version }}</td>
+                  <td v-if="isLinuxHost" class="text-left">{{ update.repo }}</td>
+                </tr>
+              </tbody>
+            </v-simple-table>
+          </div>
+
+          <div v-if="showInstalledUpdates" style="margin-top: 20px;">
+            <div class="search-bar">
+              <v-text-field
+                v-model="installedUpdatesSearch"
+                label="Perform a search"
+                dense
+                hide-details
+                @input="searchInstalledUpdates"
+              ></v-text-field>
+            </div>
+            <v-simple-table class="updates-table">
+              <thead>
+                <tr>
+                  <th class="text-left">Name</th>
+                  <th v-if="isLinuxHost" class="text-left">Version</th>
+                  <th v-if="isLinuxHost" class="text-left">Repo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(installed, index) in filteredInstalledUpdates" :key="index">
+                  <td class="text-left">{{ installed.name || installed }}</td>
+                  <td v-if="isLinuxHost" class="text-left">{{ installed.version }}</td>
+                  <td v-if="isLinuxHost" class="text-left">{{ installed.repo }}</td>
+                </tr>
+              </tbody>
+            </v-simple-table>
+          </div>
+        </div>
+        <div v-else>
           <v-toolbar flat>
-            <v-toolbar-title>Hosts Software Status</v-toolbar-title>
+            <v-toolbar-title>Select a host to see details.</v-toolbar-title>
           </v-toolbar>
-          <div class="host-list">
-            <ul>
-              <li v-for="host in hosts" :key="host.hostname" class="host-item">
-                <div class="host-item-content">
-                  <v-btn
-                    small
-                    outlined
-                    class="host-btn"
-                    :class="{ 'active-btn': selectedHost === host.hostname }"
-                    @click="onHostSelected(host.hostname, host.os_type)"
-                  >
-                    <span class="truncate">{{ host.hostname }}</span>
-                  </v-btn>
-                  <v-chip
-                    :color="host.available_updates === 0 ? 'green' : 'teal'"
-                    label
-                    pill
-                    class="ma-2"
-                  >
-                    {{ host.available_updates }}
-                  </v-chip>
-                  <v-badge
-                    :content="host.formatted_timestamp"
-                    color="secondary"
-                  >
-                  </v-badge>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </v-col>
-
-        <v-col cols="8">
-          <div v-if="hostDetails">
-            <div style="display: flex; gap: 20px; margin-top: 20px;">
-              <v-btn
-                small
-                outlined
-                :class="{ 'active-btn': activeTable === 'available' }"
-                @click="toggleTable('available')"
-              >
-                Available Updates
-              </v-btn>
-              <v-btn
-                small
-                outlined
-                :class="{ 'active-btn': activeTable === 'installed' }"
-                @click="toggleTable('installed')"
-              >
-                Installed Updates
-              </v-btn>
-            </div>
-
-            <div v-if="showAvailableUpdates" style="margin-top: 20px;">
-              <div class="search-bar">
-                <v-text-field
-                  v-model="availableUpdatesSearch"
-                  label="Search"
-                  dense
-                  hide-details
-                  @input="searchAvailableUpdates"
-                ></v-text-field>
-              </div>
-              <v-simple-table>
-                <thead>
-                  <tr>
-                    <th class="text-left">Name</th>
-                    <th v-if="isLinuxHost" class="text-left">Version</th>
-                    <th v-if="isLinuxHost" class="text-left">Repo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(update, index) in filteredAvailableUpdates" :key="index">
-                    <td class="text-left">{{ update.name || update }}</td>
-                    <td v-if="isLinuxHost" class="text-left">{{ update.version }}</td>
-                    <td v-if="isLinuxHost" class="text-left">{{ update.repo }}</td>
-                  </tr>
-                </tbody>
-              </v-simple-table>
-            </div>
-
-            <div v-if="showInstalledUpdates" style="margin-top: 20px;">
-              <div class="search-bar">
-                <v-text-field
-                  v-model="installedUpdatesSearch"
-                  label="Search"
-                  dense
-                  hide-details
-                  @input="searchInstalledUpdates"
-                ></v-text-field>
-              </div>
-              <v-simple-table>
-                <thead>
-                  <tr>
-                    <th class="text-left">Name</th>
-                    <th v-if="isLinuxHost" class="text-left">Version</th>
-                    <th v-if="isLinuxHost" class="text-left">Repo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(installed, index) in filteredInstalledUpdates" :key="index">
-                    <td class="text-left">{{ installed.name || installed }}</td>
-                    <td v-if="isLinuxHost" class="text-left">{{ installed.version }}</td>
-                    <td v-if="isLinuxHost" class="text-left">{{ installed.repo }}</td>
-                  </tr>
-                </tbody>
-              </v-simple-table>
-            </div>
-          </div>
-          <div v-else>
-            <v-toolbar flat>
-              <v-toolbar-title>Select a host to see details.</v-toolbar-title>
-            </v-toolbar>
-          </div>
-        </v-col>
-      </v-row>
-    </v-container>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -299,15 +297,23 @@ export default {
 </script>
 
 <style scoped>
-/*
-  Forces a fixed minimal table width and avoids horizontal scroll:
-  - min-width ensures the table won't shrink below that width.
-  - overflow: hidden and white-space: normal let cells wrap text
-    instead of scrolling.
-*/
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 20px;
+}
+.grid-item {
+  padding: 10px;
+}
+.hosts {
+  background-color: #f9f9f9;
+}
+.updates {
+  background-color: #ffffff;
+}
 .fixed-table {
-  min-width: 1200px;
-  table-layout: fixed;
+  max-width: 100%;
+  table-layout: auto;
   border-collapse: collapse;
   overflow: hidden;
 }
@@ -320,7 +326,6 @@ export default {
   text-overflow: ellipsis;
   vertical-align: top;
 }
-/* Remove/hide horizontal scroll bars on smaller screens */
 html,
 body {
   overflow-x: hidden;
@@ -331,7 +336,6 @@ body {
 }
 .align-left {
   margin-left: 0;
-  max-width: 100%;
 }
 .host-list ul {
   list-style-type: none;
@@ -342,9 +346,7 @@ body {
   text-align: left;
 }
 .host-item-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: block;
 }
 .host-btn {
   width: 230px; /* Set a fixed width for the buttons */
@@ -382,9 +384,16 @@ body {
 .search-bar {
   margin-bottom: 10px;
 }
+.update-buttons {
+  text-align: left; /* Align buttons to the left */
+  margin-top: 0px;  /* Reduced margin */
+}
 .active-btn {
   background-color: #1976d2 !important;
   color: white !important;
 }
-
+.updates-table {
+  width: 100%;
+  table-layout: auto;
+}
 </style>
