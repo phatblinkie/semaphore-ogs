@@ -21,7 +21,7 @@
 
     <v-container class="align-left">
       <v-row>
-        <v-col cols="3">
+        <v-col cols="4">
           <v-toolbar flat>
             <v-toolbar-title>Hosts Software Status</v-toolbar-title>
           </v-toolbar>
@@ -57,7 +57,7 @@
           </div>
         </v-col>
 
-        <v-col cols="9">
+        <v-col cols="8">
           <div v-if="hostDetails">
             <div style="display: flex; gap: 20px; margin-top: 20px;">
               <v-btn
@@ -331,6 +331,7 @@ body {
 }
 .align-left {
   margin-left: 0;
+  max-width: 100%;
 }
 .host-list ul {
   list-style-type: none;
@@ -346,7 +347,7 @@ body {
   gap: 10px;
 }
 .host-btn {
-  width: 250px; /* Set a fixed width for the buttons */
+  width: 230px; /* Set a fixed width for the buttons */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -385,4 +386,5 @@ body {
   background-color: #1976d2 !important;
   color: white !important;
 }
+
 </style>
