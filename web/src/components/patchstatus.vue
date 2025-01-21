@@ -305,10 +305,10 @@ export default {
 .grid-item {
   padding: 10px;
 }
-.hosts {
+.hostsdisabled {
   background-color: #f9f9f9;
 }
-.updates {
+.updatesdisabled {
   background-color: #ffffff;
 }
 .fixed-table {
