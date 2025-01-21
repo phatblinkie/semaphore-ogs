@@ -3,7 +3,7 @@
 # Define variables
 PACKAGE_NAME="semaphore-ogs"
 VERSION="1.0.0"
-RELEASE="6"
+RELEASE="7"
 TARBALL="${PACKAGE_NAME}-${VERSION}.tar.gz"
 SPEC_FILE="semaphore.spec"
 

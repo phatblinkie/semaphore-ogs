@@ -4,12 +4,10 @@
       <v-toolbar-title>Graphs for Host: {{ hostname }}</v-toolbar-title>
     </v-toolbar>
     <v-tabs show-arrows class="pl-4">
-      <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">System Status</v-tab>
-      <v-tab key="Graphs" :to="`/project/${projectId}/graphs`">Task Graphs</v-tab>
-      <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
-      <v-tab key="Compliancestatus" :to="`/project/${projectId}/compliancestatus`">
-        Compliance Status
+      <v-tab key="Systemstatus" :to="`/project/${projectId}/systemstatus`">
+        System Status
       </v-tab>
+      <v-tab key="Patchstatus" :to="`/project/${projectId}/patchstatus`">Patch Status</v-tab>
     </v-tabs>
     <br>
     <table width="100%">
@@ -23,7 +21,7 @@
         <v-col cols="12">
           <apexchart
             type="line"
-            height="350"
+            height="300"
             :options="diskChartOptions"
             :series="diskSeries"
             :key="diskChartKey"
@@ -34,7 +32,7 @@
         <v-col cols="12">
           <apexchart
             type="line"
-            height="350"
+            height="300"
             :options="procChartOptions"
             :series="procSeries"
             :key="procChartKey"
@@ -45,7 +43,7 @@
         <v-col cols="12">
           <apexchart
             type="line"
-            height="350"
+            height="300"
             :options="uptimeChartOptions"
             :series="uptimeSeries"
             :key="uptimeChartKey"
@@ -84,7 +82,7 @@ export default {
       ],
       diskChartOptions: {
         chart: {
-          height: 350,
+          height: 300,
           type: 'line',
         },
         xaxis: {
@@ -100,7 +98,7 @@ export default {
       },
       procChartOptions: {
         chart: {
-          height: 350,
+          height: 300,
           type: 'line',
         },
         xaxis: {
@@ -116,7 +114,7 @@ export default {
       },
       uptimeChartOptions: {
         chart: {
-          height: 350,
+          height: 300,
           type: 'line',
         },
         xaxis: {
@@ -206,7 +204,7 @@ export default {
 
 <style scoped>
 .chart-wrapper {
-  height: 400px;
+  height: 350px;
 }
 .left-aligned {
   justify-content: flex-start;
