@@ -4,7 +4,7 @@
 
 Name:           semaphore-ogs
 Version:        1.0.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Customized Semaphore and configuration
 
 License:        MIT

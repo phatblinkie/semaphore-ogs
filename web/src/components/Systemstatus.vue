@@ -157,10 +157,11 @@ export default {
     },
     formatUptime(uptime) {
       if (uptime === null) return 'N/A'; // Return 'N/A' if uptime is null
-      const seconds = uptime % 60;
+      // const seconds = uptime % 60;
       const minutes = Math.floor((uptime % 3600) / 60);
-      const hours = Math.floor(uptime / 3600);
-      return `${hours}h ${minutes}m ${seconds}s`;
+      const hours = Math.floor((uptime % 86400) / 3600);
+      const days = Math.floor(uptime / 86400);
+      return `${days}d ${hours}h ${minutes}m`;
     },
     parseDiskCapacity(diskCapacity) {
       return diskCapacity.split(', ').map((disk) => {
