@@ -1,0 +1,8 @@
+download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/microsoft-ad-1.7.1.tar.gz
+format_version: 1.0.0
+name: ad
+namespace: microsoft
+server: https://galaxy.ansible.com/api/
+signatures: []
+version: 1.7.1
+version_url: /api/v3/plugin/ansible/content/published/collections/index/microsoft/ad/versions/1.7.1/

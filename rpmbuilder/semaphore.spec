@@ -4,7 +4,7 @@
 
 Name:           semaphore-ogs
 Version:        1.0.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Customized Semaphore and configuration
 
 License:        MIT
@@ -18,7 +18,11 @@ Source0:        %{name}-%{version}.tar.gz
 #BuildRequires:  git
 #BuildRequires:  systemd-rpm-macros
 
-#Requires:       ansible
+Requires:       ansible
+Requires:	nginx
+Requires:	mariadb-server
+Requires:	php-mysqlnd
+Requires:	php-fpm
 
 BuildArch:      x86_64
 
