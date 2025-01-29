@@ -66,6 +66,28 @@ if ($os_type === 'windows') {
             $installedUpdates[] = $row['title'];
         }
         $hostDetails['installedUpdates'] = $installedUpdates;
+
+        // Fetch the list of failed updates for the specified host
+        $query = "
+            SELECT title, status, date
+            FROM windows_update_history
+            WHERE hostname = ?
+            AND operation = 'Installation'
+            AND status != 'Succeeded'
+            ORDER BY date DESC";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $hostname);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $failedUpdates = [];
+        while ($row = $result->fetch_assoc()) {
+            $failedUpdates[] = [
+            'title' => $row['title'],
+            'status' => $row['status'],
+            'date' => $row['date']
+            ];
+        }
+        $hostDetails['Failures'] = $failedUpdates;
     }
 } elseif ($os_type === 'linux') {
     // Fetch the most recent data for the specified host from linux_updates table

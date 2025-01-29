@@ -75,6 +75,15 @@
             >
               Installed Updates
             </v-btn>
+            <v-btn
+              v-if="isWindowsHost"
+              small
+              outlined
+              :class="{ 'active-btn': activeTable === 'Failures' }"
+              @click="toggleTable('Failures')"
+            >
+              Installation Failures
+            </v-btn>
           </div>
 
           <div v-if="showAvailableUpdates" style="margin-top: 20px;">
@@ -132,6 +141,34 @@
               </tbody>
             </v-simple-table>
           </div>
+
+          <div v-if="showFailures" style="margin-top: 20px;">
+            <div class="search-bar">
+              <v-text-field
+                v-model="FailuresSearch"
+                label="Perform a search"
+                dense
+                hide-details
+                @input="searchFailures"
+              ></v-text-field>
+            </div>
+            <v-simple-table class="updates-table">
+              <thead>
+                <tr>
+                  <th class="text-left">Date</th>
+                  <th class="text-left">Status</th>
+                  <th class="text-left">Title</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(entry, index) in filteredFailures" :key="index">
+                  <td class="text-left">{{ entry.date }}</td>
+                  <td class="text-left">{{ entry.status }}</td>
+                  <td class="text-left">{{ entry.title }}</td>
+                </tr>
+              </tbody>
+            </v-simple-table>
+          </div>
         </div>
         <div v-else>
           <v-toolbar flat>
@@ -160,10 +197,13 @@ export default {
       hostDetails: null,
       showAvailableUpdates: false,
       showInstalledUpdates: false,
+      showFailures: false,
       availableUpdatesSearch: '',
       installedUpdatesSearch: '',
+      FailuresSearch: '',
       filteredAvailableUpdates: [],
       filteredInstalledUpdates: [],
+      filteredFailures: [],
       selectedHost: null,
       activeTable: 'available',
       headers: [
@@ -178,6 +218,9 @@ export default {
   computed: {
     isLinuxHost() {
       return this.hostDetails && this.hostDetails.os_type === 'linux';
+    },
+    isWindowsHost() {
+      return this.hostDetails && this.hostDetails.os_type === 'windows';
     },
   },
   created() {
@@ -200,6 +243,7 @@ export default {
       this.activeTable = 'available';
       this.showAvailableUpdates = true;
       this.showInstalledUpdates = false;
+      this.showFailures = false;
       this.clearSearchFields();
       await this.fetchHostDetails(hostname, osType);
     },
@@ -213,6 +257,7 @@ export default {
         this.hostDetails.os_type = osType; // Ensure os_type is set correctly
         this.filteredAvailableUpdates = this.hostDetails.updates || [];
         this.filteredInstalledUpdates = this.hostDetails.installedUpdates || [];
+        this.filteredFailures = this.hostDetails.Failures || [];
       } catch (error) {
         console.error('Error fetching host details:', error);
       }
@@ -252,35 +297,68 @@ export default {
       });
     },
 
+    searchFailures() {
+      if (!this.FailuresSearch) {
+        this.filteredFailures = this.hostDetails.Failures || [];
+        return;
+      }
+      this.filteredFailures = this.hostDetails.Failures.filter((entry) => (
+        entry.date.toLowerCase().includes(this.FailuresSearch.toLowerCase())
+        || entry.date.toLowerCase().includes(this.FailuresSearch.toLowerCase())
+        || entry.title.toLowerCase().includes(this.FailuresSearch.toLowerCase())
+        || entry.status.toLowerCase().includes(this.FailuresSearch.toLowerCase())
+      ));
+    },
+
     toggleTable(table) {
       this.activeTable = table;
       if (table === 'available') {
         this.showAvailableUpdates = true;
         this.showInstalledUpdates = false;
+        this.showFailures = false;
         this.installedUpdatesSearch = ''; // Reset search field
+        this.FailuresSearch = ''; // Reset search field
         this.filteredAvailableUpdates = this.hostDetails.updates || [];
       } else if (table === 'installed') {
         this.showInstalledUpdates = true;
         this.showAvailableUpdates = false;
+        this.showFailures = false;
         this.availableUpdatesSearch = ''; // Reset search field
+        this.FailuresSearch = ''; // Reset search field
         this.filteredInstalledUpdates = this.hostDetails.installedUpdates || [];
+      } else if (table === 'Failures') {
+        this.showFailures = true;
+        this.showAvailableUpdates = false;
+        this.showInstalledUpdates = false;
+        this.availableUpdatesSearch = ''; // Reset search field
+        this.installedUpdatesSearch = ''; // Reset search field
+        this.filteredFailures = this.hostDetails.Failures || [];
       }
     },
 
     clearSearchFields() {
       this.availableUpdatesSearch = '';
       this.installedUpdatesSearch = '';
+      this.FailuresSearch = '';
     },
   },
   watch: {
     showAvailableUpdates(newVal) {
       if (newVal) {
         this.installedUpdatesSearch = ''; // Reset search field
+        this.FailuresSearch = ''; // Reset search field
       }
     },
     showInstalledUpdates(newVal) {
       if (newVal) {
         this.availableUpdatesSearch = ''; // Reset search field
+        this.FailuresSearch = ''; // Reset search field
+      }
+    },
+    showFailures(newVal) {
+      if (newVal) {
+        this.availableUpdatesSearch = ''; // Reset search field
+        this.installedUpdatesSearch = ''; // Reset search field
       }
     },
     installedUpdatesSearch(newVal) {
