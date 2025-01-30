@@ -21,7 +21,6 @@ $project_id = isset($_GET['project_id']) ? intval($_GET['project_id']) : 0;
 
 
 $sql = "SELECT
-  ip_address,
   hostname,
   ansible_ping,
   disk_capacity,
@@ -38,7 +37,6 @@ FROM
   system_status
 WHERE
   project_id = $project_id
-  AND (uptime != 0 OR TIMESTAMPDIFF(HOUR, last_responded, NOW()) <= 4 OR (ansible_ping = 'unreachable' AND TIMESTAMPDIFF(HOUR, last_updated, NOW()) <= 4))
 ORDER BY
   id DESC;";
 

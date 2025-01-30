@@ -51,13 +51,7 @@ WHERE
   AND (
     hostname = '$hostname'
     OR hostname LIKE '$hostname.%'
-    OR ip_address = (
-      SELECT ip_address
-      FROM system_status_history
-      WHERE project_id = $project_id
-      AND (hostname = '$hostname' OR hostname LIKE '$hostname.%')
-      LIMIT 1
-    )
+    LIMIT 1
   )
   AND $date_condition
 ORDER BY

@@ -10,22 +10,6 @@
             delay: 1
             timeout: 10
 
-        - name: Check if inventory_hostname is an IP address
-          set_fact:
-            is_ip_address: "{{ inventory_hostname | regex_search('^\\d+\\.\\d+\\.\\d+\\.\\d+$') is not none }}"
-          delegate_to: localhost
-
-        - name: Resolve IP address on control node if not already an IP address
-          shell: getent ahostsv4 {{ inventory_hostname }} | head -n 1 | awk '{print $1}'
-          register: ip_lookup
-          when: not is_ip_address
-          delegate_to: localhost
-
-        - name: Set IP address fact
-          set_fact:
-            ip_address: "{{ inventory_hostname if is_ip_address else ip_lookup.stdout.strip() }}"
-          delegate_to: localhost
-
         - name: Initialize system_status_results
           set_fact:
             system_status_results: []
@@ -70,7 +54,6 @@
             system_status_results: |
               {{
                 system_status_results + [{
-                  "ip_address": ip_address,
                   "hostname": inventory_hostname,
                   "ansible_ping": ansible_ping_output.ping,
                   "disk_capacity": cleaned_disk_capacity,
@@ -112,33 +95,11 @@
           set_fact:
             system_status_results: []
 
-        - name: Rescue-Check if inventory_hostname is an IP address
-          set_fact:
-            is_ip_address: "{{ inventory_hostname | regex_search('^\\d+\\.\\d+\\.\\d+\\.\\d+$') is not none }}"
-          delegate_to: localhost
-
-        - name: Rescue-Check if inventory_hostname is an IP address
-          set_fact:
-            is_ip_address: "{{ inventory_hostname | regex_search('^\\d+\\.\\d+\\.\\d+\\.\\d+$') is not none }}"
-          delegate_to: localhost
-
-        - name: Rescue-Resolve IP address on control node if not already an IP address
-          shell: getent ahostsv4 {{ inventory_hostname }} | head -n 1 | awk '{print $1}'
-          register: ip_lookup
-          when: not is_ip_address
-          delegate_to: localhost
-
-        - name: Rescue-Set IP address fact
-          set_fact:
-            ip_address: "{{ inventory_hostname if is_ip_address else ip_lookup.stdout.strip() }}"
-          delegate_to: localhost
-
         - name: Rescue-Append Windows data to results
           set_fact:
             system_status_results: |
               {{
                 system_status_results + [{
-                  "ip_address": ip_address,
                   "hostname": inventory_hostname,
                   "ansible_ping": "unreachable",
                   "disk_capacity": "0",
