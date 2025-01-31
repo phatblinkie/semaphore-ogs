@@ -88,7 +88,12 @@
         <AppCheckStatus :status="item.app_check" />
       </template>
       <template v-slot:item.last_responded="{ item }">
-        <span>{{ formatTimestamp(item.last_responded) }}</span>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <span v-bind="attrs" v-on="on">{{ formatTimeDifference(item.last_responded) }}</span>
+          </template>
+          <span>{{ formatTimestamp(item.last_responded) }}</span>
+        </v-tooltip>
       </template>
       <template v-slot:item.uptime="{ item }">
         <span v-if="item.ansible_ping !== 'unreachable'">{{ formatUptime(item.uptime) }}</span>
@@ -154,6 +159,21 @@ export default {
       if (!timestamp) return 'N/A'; // Return 'N/A' if timestamp is undefined or null
       const date = new Date(timestamp.replace(' ', 'T')); // Replace space with 'T' to make it ISO 8601 compliant
       return date.toLocaleString(); // Format the date as a local string
+    },
+    formatTimeDifference(timestamp) {
+      if (!timestamp) return 'N/A'; // Return 'N/A' if timestamp is undefined or null
+      const date = new Date(timestamp.replace(' ', 'T')); // Replace space with 'T' to make it ISO 8601 compliant
+      const now = new Date();
+      const diff = Math.abs(now - date);
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      if (days > 0) {
+        return `${days}d ${hours % 24}h ${minutes % 60}m ago`;
+      } if (hours > 0) {
+        return `${hours}h ${minutes % 60}m ago`;
+      }
+      return `${minutes}m ago`;
     },
     formatUptime(uptime) {
       if (uptime === null) return 'N/A'; // Return 'N/A' if uptime is null
