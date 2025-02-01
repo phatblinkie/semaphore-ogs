@@ -85,7 +85,9 @@
         </div>
       </template>
       <template v-slot:item.app_check="{ item }">
-        <AppCheckStatus :status="item.app_check" />
+        <div v-for="(service, index) in item.app_check.split(', ')" :key="index">
+          <AppCheckStatus :status="service.split(': ')[1]" :service="service.split(': ')[0]" />
+        </div>
       </template>
       <template v-slot:item.last_responded="{ item }">
         <v-tooltip bottom>

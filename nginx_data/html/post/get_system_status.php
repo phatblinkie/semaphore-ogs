@@ -25,10 +25,7 @@ $sql = "SELECT
   ansible_ping,
   disk_capacity,
   proc_usage,
-  CASE
-    WHEN app_check IN ('running', 'started') THEN 'OK'
-    ELSE 'Failed'
-  END AS app_check,
+  app_check,
   last_updated,
   last_responded,
   id,

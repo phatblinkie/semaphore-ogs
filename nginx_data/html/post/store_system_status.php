@@ -1,4 +1,5 @@
 <?php
+
 // Database credentials
 $servername = "localhost";
 $username = "semaphore_user";
