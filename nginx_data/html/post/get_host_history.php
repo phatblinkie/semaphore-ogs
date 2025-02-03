@@ -51,7 +51,6 @@ WHERE
   AND (
     hostname = '$hostname'
     OR hostname LIKE '$hostname.%'
-    LIMIT 1
   )
   AND $date_condition
 ORDER BY

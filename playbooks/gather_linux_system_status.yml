@@ -13,8 +13,9 @@
         - mysqld
       mediaserver:
         - sshd
-        - smb
-        - nfs-server
+      gameserver:
+        - sshd
+        - rust
   gather_facts: false
   tasks:
     - block:
@@ -52,28 +53,42 @@
           set_fact:
             services_to_check_for_host: "{{ services_to_check[inventory_hostname] | default(services_to_check['default']) }}"
 
-        - name: Check service status
-          service:
-            name: "{{ service_item }}"
-            state: started
+#        #this is commented out, because we may not want to activate the service, only check it.
+#        - name: Check service status
+#          service:
+#            name: "{{ service_item }}"
+#            state: started
+#          register: app_check_output
+#          loop: "{{ services_to_check_for_host }}"
+#          loop_control:
+#            loop_var: service_item
+#          when: ansible_ping_output.ping == 'pong'
+#          failed_when: false
+#          changed_when: true
+#          check_mode: yes
+#          ignore_errors: yes
+
+        - name: Check service status with systemctl
+          shell: "systemctl is-active {{ service_item}} || true"
           register: app_check_output
           loop: "{{ services_to_check_for_host }}"
           loop_control:
             loop_var: service_item
           when: ansible_ping_output.ping == 'pong'
           failed_when: false
-          changed_when: true
-          check_mode: no
           ignore_errors: yes
 
         - name: Append service status to results
           set_fact:
-            app_check_results: "{{ app_check_results + [item.service_item + ': ' + item.state] }}"
+#            app_check_results: "{{ app_check_results + [item.service_item + ': ' + item.state] }}"
+            app_check_results: "{{ app_check_results + [item.service_item + ': ' + item.stdout] }}"
           loop: "{{ app_check_output.results }}"
           loop_control:
             loop_var: item
-            label: "{{ [item.service_item + ': ' + item.state] }}"
-          when: item is defined and item.state is defined
+#            label: "{{ [item.service_item + ': ' + item.state] }}"
+            label: "{{ [item.service_item + ': ' + item.stdout] }}"
+#          when: item is defined and item.state is defined
+          when: item is defined and item.stdout is defined
           no_log: false
 
         - name: Append Linux data to results
@@ -109,11 +124,16 @@
           register: postoutput
           delegate_to: localhost
 
-            #        - name: post results
-            #          debug:
-            #            var: postoutput
+#        - name: post results
+#          debug:
+#            var: postoutput
 
       rescue:
+        - name: Initialize system_status_results
+          set_fact:
+            system_status_results: []
+            app_check_results: []
+
         - name: Handle unreachable hosts
           set_fact:
             system_status_results: |
@@ -123,7 +143,7 @@
                   "ansible_ping": "unreachable",
                   "disk_capacity": "0",
                   "proc_usage": ["0"],
-                  "app_check": "FAILED",
+                  "app_check": "sshd: unreachable",
                   "uptime": 0,
                   "project_id": semaphore_vars.task_details.project_id,
                   "task_id": semaphore_vars.task_details.id
@@ -140,5 +160,9 @@
               Content-Type: application/json
             status_code: 200
             return_content: True
-          register: postoutput
+          register: postoutputrescue
           delegate_to: localhost
+
+        - name: Rescue-Output post results
+          debug:
+            var: postoutputrescue

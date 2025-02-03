@@ -42,11 +42,11 @@
           "project_id": "{{ project_id }}"
         }
 
-        #    - name: Save combined updates to file
-        #      copy:
-        #        content: "{{ combined_updates | to_nice_json }}"
-        #        dest: "/home/admin/repos/semaphore-ogs/combined_updates.json"
-        #      delegate_to: localhost
+#    - name: Save combined updates to file
+#      copy:
+#        content: "{{ combined_updates | to_nice_json }}"
+#        dest: "/home/admin/repos/semaphore-ogs/combined_updates.json"
+#      delegate_to: localhost
 
     - name: Send historical data to database
       ansible.builtin.uri:

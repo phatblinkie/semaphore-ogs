@@ -1,6 +1,18 @@
 ---
 - name: Gather Windows System Status Data
   hosts: win_hosts
+  vars:
+    ansible_remote_tmp: /var/tmp/ans
+    host_key_checking: false
+    services_to_check:
+      default:
+        - winrm
+      '192.168.11.57':
+        - winrm
+        - nginx
+        - mysqld
+      '192.168.10.19':
+        - sshd
   gather_facts: false
   tasks:
     - name: Gather data from Windows hosts
@@ -8,11 +20,12 @@
         - name: Test Connections
           wait_for_connection:
             delay: 1
-            timeout: 10
+            timeout: 30
 
         - name: Initialize system_status_results
           set_fact:
             system_status_results: []
+            app_check_results: []
 
         - name: Gather Ansible Ping
           win_ping:
@@ -38,12 +51,23 @@
           win_shell: (Get-WmiObject -Class Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average
           register: proc_usage_output
 
+        - name: Determine services to check
+          set_fact:
+            services_to_check_for_host: "{{ services_to_check[inventory_hostname] | default(services_to_check['default']) }}"
+
         - name: Gather App Check for WinRM
           win_service:
             name: WinRM
             start_mode: auto
             state: started
           register: app_check_output
+
+        - name: Get info for all installed services
+          ansible.windows.win_service_info:
+          register: service_info_output
+#        - name: Rescue-Output results failed hosts
+#          debug:
+#            var: service_info_output
 
         - name: Clean up disk capacity output
           set_fact:
@@ -104,7 +128,7 @@
                   "ansible_ping": "unreachable",
                   "disk_capacity": "0",
                   "proc_usage": ["0"],
-                  "app_check": "FAILED",
+                  "app_check": "system: unreachable",
                   "uptime": "0",
                   "project_id": semaphore_vars.task_details.project_id,
                   "task_id": semaphore_vars.task_details.id
@@ -124,10 +148,10 @@
           register: postoutput
           delegate_to: localhost
 
-            #        - name: Rescue-Output results failed hosts
-            #          debug:
-            #            var: system_status_results
+#        - name: Rescue-Output results failed hosts
+#          debug:
+#            var: system_status_results
 
-            #        - name: Rescue-Output post results
-            #          debug:
-            #            var: postoutput
+#        - name: Rescue-Output post results
+#          debug:
+#            var: postoutput

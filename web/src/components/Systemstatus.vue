@@ -12,12 +12,12 @@
     <v-data-table
       :headers="headers"
       :items="items"
-      :items-per-page="20"
+      :items-per-page="30"
       :options.sync="tableOptions"
       class="mt-4"
       dense
       :footer-props="{
-        'items-per-page-options': [20, 50, 100],
+        'items-per-page-options': [30, 50, 100],
         'items-per-page-text': 'Rows per page:',
         'show-first-last-page': true,
         'show-current-page': true,
@@ -85,8 +85,22 @@
         </div>
       </template>
       <template v-slot:item.app_check="{ item }">
-        <div v-for="(service, index) in item.app_check.split(', ')" :key="index">
-          <AppCheckStatus :status="service.split(': ')[1]" :service="service.split(': ')[0]" />
+        <div v-if="item.app_check">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <div v-bind="attrs" v-on="on">
+                <AppCheckStatus :status="getOverallStatus(item.app_check)" />
+              </div>
+            </template>
+            <div>
+              <div v-for="(service, index) in parseAppCheck(item.app_check)" :key="index">
+                {{ service.name }}: {{ service.status }}
+              </div>
+            </div>
+          </v-tooltip>
+        </div>
+        <div v-else>
+          No services monitored
         </div>
       </template>
       <template v-slot:item.last_responded="{ item }">
@@ -194,6 +208,37 @@ export default {
     isDiskOver90(diskCapacity) {
       return this.parseDiskCapacity(diskCapacity).some((disk) => disk.used > 90);
     },
+    parseAppCheck(appCheck) {
+      if (!appCheck) return [];
+      return appCheck.split(',').map((service) => {
+        const [name, status] = service.split(':').map((s) => s.trim());
+        return { name: name || 'Unknown', status: status || 'Unknown' };
+        //        return {
+        //          name: name || 'Unknown',
+        //          status: status && (status.toLowerCase().includes('stopped') || status.toLowerCase().includes('failed') || status.toLowerCase().includes('inactive')
+        //           || status.toLowerCase() === 'started') ? status : 'Success',
+        //        };
+      });
+    },
+    //    getOverallStatus(appCheck) {
+    //      const services = this.parseAppCheck(appCheck);
+    //      return services.some((service) => service.status.toLowerCase().includes('stopped') || service.status.toLowerCase().includes('unknown') || service.status.toLowerCase().includes('unreachable')
+    //        || service.status.toLowerCase().includes('failed') || service.status.toLowerCase() === 'inactive') ? 'Failed' : 'Success';
+    //    },
+    getOverallStatus(appCheck) {
+      const services = this.parseAppCheck(appCheck);
+      if (services.some((service) => service.status.toLowerCase().includes('unreachable'))) {
+        // console.log('unreachable');
+        return 'N/A';
+      }
+      if (services.some((service) => service.status.toLowerCase().includes('stopped') || service.status.toLowerCase().includes('unknown')
+        || service.status.toLowerCase().includes('failed') || service.status.toLowerCase() === 'inactive')) {
+        // console.log('failed');
+        return 'Failed';
+      }
+      return 'Success';
+    },
+
   },
 };
 </script>

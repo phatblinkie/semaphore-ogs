@@ -12,34 +12,28 @@ export default {
   },
   methods: {
     getStatusIcon(status) {
-      switch (status) {
-        case 'OK':
-          return 'mdi-check-circle';
-        case 'Failed':
-          return 'mdi-alert-circle';
-        default:
-          return 'mdi-help-circle';
+      if (!status || status.toLowerCase().includes('stopped') || status.toLowerCase().includes('failed') || status.toLowerCase() === 'n/a') {
+        return 'mdi-alert-circle';
       }
+      return 'mdi-check-circle';
     },
     humanizeStatus(status) {
-      switch (status) {
-        case 'OK':
-          return 'OK';
-        case 'Failed':
-          return 'Failed';
-        default:
-          return 'Unknown';
+      if (!status || status.toLowerCase() === 'n/a') {
+        return 'N/A';
       }
+      if (!status || status.toLowerCase().includes('stopped') || status.toLowerCase().includes('failed')) {
+        return 'Failed';
+      }
+      return 'Success';
     },
     getStatusColor(status) {
-      switch (status) {
-        case 'OK':
-          return 'success';
-        case 'Failed':
-          return 'error';
-        default:
-          return 'grey';
+      if (!status || status.toLowerCase() === 'n/a') {
+        return 'warn';
       }
+      if (!status || status.toLowerCase().includes('stopped') || status.toLowerCase().includes('failed')) {
+        return 'error';
+      }
+      return 'success';
     },
   },
 };

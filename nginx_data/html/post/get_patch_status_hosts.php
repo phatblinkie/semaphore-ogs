@@ -80,8 +80,7 @@ echo json_encode($hosts);
 
 function formatTimestamp($timestamp) {
     // Set the desired timezone
-//    $timezone = new DateTimeZone('America/Chicago'); // Change to your desired timezone
-    $timezone = new DateTimeZone('America/New_York'); 
+    $timezone = new DateTimeZone('America/Chicago'); // Change to your desired timezone
 
     $datetime1 = new DateTime($timestamp, $timezone);
     $datetime2 = new DateTime('now', $timezone);
