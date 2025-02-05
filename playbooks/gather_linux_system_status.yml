@@ -16,6 +16,21 @@
       gameserver:
         - sshd
         - rust
+      netcfgsvr1.j114.army.mil:
+        - jCon.Service
+        - sshd
+      vnia1.j114.army.mil:
+        - quagga
+        - frr.service
+        - pimd.service
+      vnia2.j114.army.mil:
+        - quagga
+        - frr.service
+        - pimd.service
+      vnia4.j114.army.mil:
+        - quagga
+        - frr.service
+        - pimd.service
   gather_facts: false
   tasks:
     - block:
