@@ -19,16 +19,20 @@ $data = file_get_contents('php://input');
 $data = json_decode($data, true);
 
 // Initialize response
-$response = ['status' => 'error', 'message' => 'Invalid data'];
+$response = ['status' => 'error', 'message' => 'Invalid data', 'received_data' => $data];
 
 // Check if data exists and has all required fields
 if ($data && is_array($data)) {
     $valid = true;
+    $missing_fields = [];
 
-    foreach ($data as $item) {
-        if (!isset($item['hostname'], $item['ansible_ping'], $item['disk_capacity'], $item['proc_usage'], $item['app_check'], $item['uptime'], $item['project_id'], $item['task_id'])) {
-            $valid = false;
-            break;
+    foreach ($data as $index => $item) {
+        $required_fields = ['hostname', 'ansible_ping', 'disk_capacity', 'proc_usage', 'app_check', 'uptime', 'project_id', 'task_id'];
+        foreach ($required_fields as $field) {
+            if (!isset($item[$field])) {
+                $valid = false;
+                $missing_fields[$index][] = $field;
+            }
         }
     }
 
@@ -86,12 +90,12 @@ if ($data && is_array($data)) {
 
         // Return a response
         if ($success) {
-            $response = ['status' => 'success'];
+            $response = ['status' => 'success', 'message' => 'Data processed successfully', 'received_data' => $data];
         } else {
-            $response = ['status' => 'error', 'message' => 'Failed to insert data'];
+            $response = ['status' => 'error', 'message' => 'Failed to insert data', 'received_data' => $data];
         }
     } else {
-        $response = ['status' => 'error', 'message' => 'Missing required fields'];
+        $response = ['status' => 'error', 'message' => 'Missing fields', 'missing_fields' => $missing_fields, 'received_data' => $data];
     }
 }
 

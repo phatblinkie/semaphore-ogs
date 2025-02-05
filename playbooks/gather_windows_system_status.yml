@@ -9,10 +9,57 @@
         - winrm
       '192.168.11.57':
         - winrm
-        - nginx
-        - mysqld
+        - LanmanWorkstation
       '192.168.10.19':
-        - sshd
+        - Netlogon
+        - LanmanServer
+      dc1.j114.army.mil:
+        - dns
+        - kdc
+        - ntds
+        - winrm
+        - Netlogon
+      dc2.j114.army.mil:
+        - dns
+        - kdc
+        - ntds
+        - winrm
+        - Netlogon
+      ENTERPRISE-CA.J114.ARMY.MIL:
+        - certsvc
+        - winrm
+      FMV.J114.ARMY.MIL:
+        - openfire
+        - dhcpserver
+      HBSS.J114.ARMY.MIL:
+        - hqmc-hbss-mcafee-epolicy-orchestrator
+        - hqmc-hbss-mcafee-agent
+        - winrm
+        - epo svcs (5)+db
+        - MCAFEEAPACHESRV
+        - MCAFEEEVENTPARSER
+      ans-syscon.j114.army.mil:
+        - winrm
+        - Netlogon
+        - VANTAGE
+        - MySQL
+      viewcon.j114.army.mil:
+        - Netlogon
+        - winrm
+        - hor view
+        - ws broker
+      vsql.j114.army.mil:
+        - Netlogon
+        - winrm
+        - mssqlserver
+      vader-5.5.j114.army.mil:
+        - Netlogon
+        - winrm
+        - MySQL57
+      VMFWS3.J114.ARMY.MIL:
+        - winrm
+        - Netlogon
+
   gather_facts: false
   tasks:
     - name: Gather data from Windows hosts
@@ -20,7 +67,7 @@
         - name: Test Connections
           wait_for_connection:
             delay: 1
-            timeout: 30
+            timeout: 20
 
         - name: Initialize system_status_results
           set_fact:
@@ -43,35 +90,41 @@
             Get-Volume | Where-Object { $_.DriveType -eq 'Fixed' -and $_.DriveLetter } | Select-Object DriveLetter, @{Name="Used";Expression={[math]::Floor((($_.Size - $_.SizeRemaining) / $_.Size) * 100)}} | ForEach-Object { "$($_.DriveLetter) $($_.Used)" }
           register: disk_capacity_output
 
-            #        - name: Debug Disk Capacity Output
-            #          debug:
-            #            var: disk_capacity_output
-
         - name: Gather Process Usage
           win_shell: (Get-WmiObject -Class Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average
           register: proc_usage_output
 
-        - name: Determine services to check
-          set_fact:
-            services_to_check_for_host: "{{ services_to_check[inventory_hostname] | default(services_to_check['default']) }}"
-
-        - name: Gather App Check for WinRM
-          win_service:
-            name: WinRM
-            start_mode: auto
-            state: started
-          register: app_check_output
-
-        - name: Get info for all installed services
-          ansible.windows.win_service_info:
-          register: service_info_output
-#        - name: Rescue-Output results failed hosts
-#          debug:
-#            var: service_info_output
-
         - name: Clean up disk capacity output
           set_fact:
             cleaned_disk_capacity: "{{ disk_capacity_output.stdout_lines | map('regex_replace', '^\\s+', '') | join(', ') }}"
+
+        - name: Set services to check for each host
+          set_fact:
+            services_to_check_for_host: "{{ services_to_check[inventory_hostname] | default(services_to_check['default']) }}"
+
+        - name: Check service status
+          ansible.windows.win_service_info:
+            name: "{{ service_item }}"
+          register: app_check_output
+          loop: "{{ services_to_check_for_host }}"
+          loop_control:
+            loop_var: service_item
+          when: ansible_ping_output.ping == 'pong'
+          failed_when: false
+
+        - name: Process service status
+          set_fact:
+            app_check_results: "{{ app_check_results | default([]) + [item.invocation.module_args.name ~ ': ' ~ (item.services[0].state if 'services' in item and item.services | length > 0 else 'unknown')] }}"
+          loop: "{{ app_check_output.results }}"
+          loop_control:
+            loop_var: item
+            label: "{{ [item.invocation.module_args.name ~ ': ' ~ (item.services[0].state if 'services' in item and item.services | length > 0 else 'unknown')] }}"
+          when: ansible_ping_output.ping == 'pong'
+          failed_when: false
+
+#        - name: Display service status
+#          debug:
+#            msg: "{{ app_check_results }}"
 
         - name: Append Windows data to results
           set_fact:
@@ -82,7 +135,7 @@
                   "ansible_ping": ansible_ping_output.ping,
                   "disk_capacity": cleaned_disk_capacity,
                   "proc_usage": proc_usage_output.stdout_lines,
-                  "app_check": app_check_output.state,
+                  "app_check": app_check_results | join(', '),
                   "uptime": uptime_output.stdout,
                   "project_id": semaphore_vars.task_details.project_id,
                   "task_id": semaphore_vars.task_details.id
@@ -107,12 +160,8 @@
 #            msg:
 #              - "post output:"
 #              - "{{ postoutput }}"
-#              - "semaphore vars"
-#              - "{{ semaphore_vars }}"
-
-            #        - name: Output results
-            #          debug:
-            #            var: system_status_results
+#              - "system_status_results:"
+#              - "{{ system_status_results }}"
 
       rescue:
         - name: Rescue-Initialize system_status_results
@@ -147,11 +196,3 @@
             return_content: True
           register: postoutput
           delegate_to: localhost
-
-#        - name: Rescue-Output results failed hosts
-#          debug:
-#            var: system_status_results
-
-#        - name: Rescue-Output post results
-#          debug:
-#            var: postoutput
